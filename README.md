@@ -1,106 +1,221 @@
+<div align="center">
+
 # NL2SQL CLI
 
-Agentic NL2SQL CLI with self-correcting query generation, LLM-as-judge evaluation, and Docker-sandboxed execution.
+**Agentic natural language → SQL with self-correcting generation, LLM-as-judge evaluation, and Docker-sandboxed execution.**
 
-## Overview
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](https://python.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](LICENSE)
+[![Built with Textual](https://img.shields.io/badge/TUI-Textual-6366f1)](https://textual.textualize.io)
 
-NL2SQL CLI converts natural language questions into SQL queries using a progressive multi-step agentic loop. It tries a cheap finetuned model first, escalates to a superior model on failure, and validates each attempt using Docker-sandboxed execution and an LLM judge. Optional Redis caching and Langfuse observability are available.
+</div>
 
-## Interactive Architecture Diagrams
+---
 
-Two interactive HTML diagrams are included in `docs/`:
+## What it does
 
-| Diagram | File | Description |
+NL2SQL CLI converts plain-English questions into SQL queries against a local SQLite database. It runs a multi-step agentic loop: try a cheap finetuned model first, validate the result in an isolated Docker container, let an LLM judge score it, and — only on failure — escalate to a more capable model with full error context fed back. Optional Redis caching and Langfuse tracing slot in without changing the core path.
+
+```
+$ nl2sql query "How many users signed up last month?"
+
+▶ Step 1 (finetuned) – generating…
+  ✓ SQL:  SELECT COUNT(*) FROM users WHERE created_at >= date('now','-1 month')
+▶ Executing in Docker sandbox…
+  ✓ Result: 1 row
+▶ Judge verdict: PASS (score 9/10)
+
+┌──────────┐
+│ COUNT(*) │
+├──────────┤
+│   2 841  │
+└──────────┘
+```
+
+---
+
+## System Architecture
+
+<img src="docs/architecture.svg" alt="NL2SQL CLI Architecture" width="100%"/>
+
+> Interactive version with pan/zoom, search, and dark mode: [`docs/architecture.html`](docs/architecture.html)
+
+---
+
+## Query Execution Flow
+
+<img src="docs/workflow.svg" alt="NL2SQL Query Execution Flow" width="100%"/>
+
+> Interactive version: [`docs/workflow.html`](docs/workflow.html)
+
+---
+
+## Components
+
+| Module | File | Role |
 |---|---|---|
-| **System Architecture** | [`docs/architecture.html`](docs/architecture.html) | Components, boundaries, and data paths |
-| **Query Execution Flow** | [`docs/workflow.html`](docs/workflow.html) | Step-by-step query processing with escalation logic |
+| **CLI Entry** | `nl2sql/cli.py` | Click group: launches TUI by default; exposes `init`, `query`, `status` |
+| **Config** | `nl2sql/core/config.py` | Walks cwd → git root → `$HOME` for `.env`; builds a typed `Config` dataclass |
+| **Textual TUI** | `nl2sql/tui/app.py` | Rich terminal UI: query input, live event log, result table, CSV export (Ctrl+E) |
+| **Agentic Loop** | `nl2sql/core/engine.py` | Orchestrates generate → execute → judge with progressive model escalation |
+| **LLM Client** | `nl2sql/core/llm.py` | OpenAI-compatible HTTP client; handles generation, judging, and HF warmup ping |
+| **Docker Sandbox** | `nl2sql/core/sandbox.py` | Runs SQL in an isolated container against a read-only DB copy; falls back to local SQLite |
+| **Session Store** | `nl2sql/core/session.py` | Saves every attempt and verdict to `~/.nl2sql/sessions.db` |
+| **Worker / Cache** | `nl2sql/queue/worker.py` | Optional RQ task + Redis cache-aside; pub/sub progress for distributed use |
 
-Open either file in a browser. Both diagrams support pan/zoom, dark/light theme, and search.
+---
 
-## Architecture
+## How the Agentic Loop Works
 
 ```
-User (TUI / CLI)
-    │
-    ▼
-CLI Entry (cli.py)
-    ├─── Config (core/config.py)   ← reads .env: DB, schema, LLM endpoints
-    └─── Textual TUI (tui/app.py)
-              │
-              ▼
-         Agentic Loop (core/engine.py)
-              ├── Redis cache check (optional, skip if hit)
-              ├── LLM Client (core/llm.py)
-              │     ├── Step 1 → HuggingFace finetuned model
-              │     └── Steps 2-3 → OmniRoute superior model (with error feedback)
-              ├── Docker Sandbox (core/sandbox.py) → Docker container (read-only DB)
-              ├── LLM Judge → OmniRoute eval (pass/fail)
-              ├── Session Store (core/session.py) → SQLite
-              └── Langfuse (core/tracing.py) → trace spans (optional)
+Question + Schema
+        │
+        ▼
+   Redis Cache ──hit──▶ return cached SQL
+        │ miss
+        ▼
+ ┌─────────────────────────────────────────────────────┐
+ │  Step 1  ─  Finetuned model (HuggingFace)           │
+ │    Generate SQL → Execute (Docker) → Judge           │
+ │    PASS ──────────────────────────────▶ done         │
+ │    FAIL ──▶ capture error + SQL                     │
+ │                                                     │
+ │  Step 2-3  ─  Superior model (OmniRoute)            │
+ │    Generate SQL (with error context) → Execute      │
+ │    → Judge                                          │
+ │    PASS ──────────────────────────────▶ done         │
+ │    FAIL ──▶ return best attempt seen so far         │
+ └─────────────────────────────────────────────────────┘
+        │
+        ▼
+  Persist to sessions.db
+  Write to Redis cache (1-hour TTL)
+  Emit Langfuse span (if configured)
 ```
 
-### Components
+**Why two models?**  
+The finetuned HuggingFace model is fast and cheap — ideal for queries it was trained on. The OmniRoute superior model handles anything novel, and receives the previous SQL and error message as context so it can self-correct rather than starting from scratch.
 
-| Component | File | Role |
-|---|---|---|
-| **CLI Entry** | `nl2sql/cli.py` | Command entrypoint; launches TUI or runs bare `query`/`init`/`status` |
-| **Config** | `nl2sql/core/config.py` | Loads `.env` from cwd → git root → home; builds `Config` dataclass |
-| **Textual TUI** | `nl2sql/tui/app.py` | Rich terminal UI with query input, live log, result table, CSV export |
-| **Agentic Loop** | `nl2sql/core/engine.py` | Orchestrates generate → execute → judge with progressive escalation |
-| **LLM Client** | `nl2sql/core/llm.py` | OpenAI-compatible HTTP client for SQL generation and judging |
-| **Docker Sandbox** | `nl2sql/core/sandbox.py` | Runs SQL in an isolated Docker container against a read-only DB copy |
-| **Session Store** | `nl2sql/core/session.py` | Persists query history and all attempts to `~/.nl2sql/sessions.db` |
-| **Worker/Cache** | `nl2sql/queue/worker.py` | Optional RQ distributed task + Redis pub/sub for cache-aside pattern |
+**Why Docker?**  
+SQL execution happens inside an isolated container against a read-only copy of the database. A malformed or destructive query cannot touch the real file.
 
-### Query Execution Flow
-
-1. User submits a natural language question
-2. Engine checks Redis cache (semantic hash of question + schema)
-3. On cache miss: step 1 — finetuned HuggingFace model generates SQL
-4. SQL is executed inside a Docker container (read-only DB copy)
-5. LLM judge evaluates correctness
-6. On failure: steps 2–3 — OmniRoute superior model retries with error context
-7. Final SQL and result are displayed; session is persisted to SQLite
-
-## Configuration
-
-All settings via `.env` in any parent directory up to `$HOME`:
-
-```env
-# Required
-DB_PATH=./my.db
-SCHEMA_PATH=./schema.sql
-
-# LLM endpoints
-HF_ENDPOINT=https://your-hf-inference-endpoint
-HF_TOKEN=hf_...
-OMNIROUTE_URL=https://your-omniroute-url
-OMNIROUTE_GEN_MODEL=gpt-4o
-OMNIROUTE_JUDGE_MODEL=gpt-4o-mini
-
-# Optional
-REDIS_URL=redis://localhost:6379
-LANGFUSE_PUBLIC_KEY=pk-...
-LANGFUSE_SECRET_KEY=sk-...
-LANGFUSE_HOST=https://cloud.langfuse.com
-MAX_FINETUNED_STEPS=1
-MAX_TOTAL_STEPS=3
-```
+---
 
 ## Installation
 
 ```bash
 pip install -e .
-nl2sql init        # scaffold .env template
-nl2sql             # launch TUI
-nl2sql query "How many users signed up last month?"
 ```
 
-## Key Design Decisions
+**Requirements:** Python ≥ 3.10, Docker (optional but recommended), Redis (optional).
 
-- **Progressive escalation**: cheap finetuned model first, expensive superior model only on failure — reduces cost
-- **Self-correcting loop**: error text and prior SQL are fed back as context on retry
-- **Sandbox isolation**: Docker prevents malformed SQL from corrupting the real database
-- **Semantic caching**: Redis caches results by `hash(question + schema identifiers)` — 1hr TTL
-- **Streaming events**: `AgenticLoop` is an async generator; TUI updates live as steps complete
-- **Everything optional**: Docker, Redis, and Langfuse all fall back gracefully when unavailable
+---
+
+## Quick Start
+
+```bash
+# 1. Write config to .env
+nl2sql init --db ./my.db --schema ./schema.sql
+
+# 2. Launch the TUI
+nl2sql
+
+# 3. Or run a one-shot query
+nl2sql query "Show the top 5 products by revenue this quarter"
+
+# 4. JSON output for scripting
+nl2sql query "Total orders today" --json-output
+```
+
+---
+
+## Configuration
+
+All settings are read from `.env` — searched from the current directory up to `$HOME`.
+
+```env
+# ── Required ──────────────────────────────────────────
+DB_PATH=./database/production.db
+SCHEMA_PATH=./database/schema.sql
+
+# ── Finetuned model (Step 1) ──────────────────────────
+HF_ENDPOINT=https://your-endpoint.huggingface.cloud
+HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# ── Superior model (Steps 2-3 + Judge) ───────────────
+OMNIROUTE_URL=https://your-omniroute-host
+OMNIROUTE_GEN_MODEL=gpt-4o
+OMNIROUTE_JUDGE_MODEL=gpt-4o-mini
+
+# ── Optional: Caching ─────────────────────────────────
+REDIS_URL=redis://localhost:6379        # omit to disable
+
+# ── Optional: Observability ───────────────────────────
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_HOST=https://cloud.langfuse.com
+
+# ── Tuning ────────────────────────────────────────────
+MAX_FINETUNED_STEPS=1   # how many steps use the finetuned model
+MAX_TOTAL_STEPS=3       # maximum retry attempts overall
+```
+
+---
+
+## TUI Keybindings
+
+| Key | Action |
+|---|---|
+| `Ctrl+N` | New session |
+| `Ctrl+E` | Export results to CSV |
+| `F1` | Help |
+| `Ctrl+C` | Quit |
+
+---
+
+## Project Layout
+
+```
+nl2sql/
+├── cli.py               # Click entrypoint
+├── core/
+│   ├── config.py        # Config loader (.env → dataclass)
+│   ├── engine.py        # AgenticLoop (generate → execute → judge)
+│   ├── llm.py           # LLMClient (generate_sql, judge_sql, ping)
+│   ├── sandbox.py       # DockerSandbox + local SQLite fallback
+│   ├── session.py       # SQLite session history
+│   └── tracing.py       # Langfuse integration
+├── tui/
+│   ├── app.py           # Textual NL2SQLApp
+│   └── dialogs/         # Help modal
+└── queue/
+    └── worker.py        # RQ task + Redis cache
+
+docs/
+├── architecture.json    # Archify source spec
+├── architecture.html    # Interactive diagram
+├── architecture.svg     # Static embed (this README)
+├── workflow.json
+├── workflow.html
+└── workflow.svg
+```
+
+---
+
+## Design Decisions
+
+**Progressive escalation** — The cheap model runs first. Only a failed judge verdict triggers the expensive model, keeping inference costs low on common queries.
+
+**Error feedback loop** — On retry, the superior model receives the previous SQL attempt and the exact execution error. This is strictly more information than a fresh prompt, and empirically leads to faster self-correction.
+
+**Sandbox isolation** — Docker prevents any query from mutating or reading outside the intended scope. The container receives a base64-encoded SQL string, not a shell command.
+
+**Semantic caching** — Redis caches by `hash(question + schema identifiers)`. A repeated or paraphrased question that hashes the same way returns instantly without touching the LLMs.
+
+**Everything optional** — Docker, Redis, and Langfuse degrade gracefully: Docker falls back to local SQLite, Redis is simply skipped, Langfuse is a no-op. The core loop has no hard dependencies on any of them.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
