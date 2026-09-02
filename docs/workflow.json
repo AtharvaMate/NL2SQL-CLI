@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "NL2SQL Query Execution Flow",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "viewBox": [820, 740]
+  },
+  "lanes": [
+    { "id": "user_lane",   "label": "User / TUI" },
+    { "id": "engine_lane", "label": "Engine" },
+    { "id": "llm_lane",    "label": "LLM Layer" },
+    { "id": "infra_lane",  "label": "Infrastructure" }
+  ],
+  "phases": [
+    { "id": "input",       "label": "Input",          "fromCol": 0, "toCol": 0 },
+    { "id": "cache",       "label": "Cache Check",    "fromCol": 1, "toCol": 1 },
+    { "id": "generation",  "label": "SQL Generation", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "execution",   "label": "Execute + Judge","fromCol": 4, "toCol": 4 },
+    { "id": "output",      "label": "Output",         "fromCol": 5, "toCol": 5 }
+  ],
+  "mainPath": ["query_in", "cache_check", "finetuned_gen", "docker_exec", "judge", "display"],
+  "nodes": [
+    { "id": "query_in",     "lane": "user_lane",   "col": 0, "type": "frontend", "label": "User Query",     "sublabel": "NL question" },
+    { "id": "cache_check",  "lane": "engine_lane", "col": 1, "type": "backend",  "label": "Cache Check",    "sublabel": "Redis lookup" },
+    { "id": "cache_hit",    "lane": "infra_lane",  "col": 1, "type": "database", "label": "Cache Hit",      "sublabel": "Cached SQL" },
+    { "id": "finetuned_gen","lane": "llm_lane",    "col": 2, "type": "backend",  "label": "Finetuned LLM",  "sublabel": "HuggingFace", "tag": "step 1" },
+    { "id": "superior_gen", "lane": "llm_lane",    "col": 3, "type": "backend",  "label": "Superior LLM",   "sublabel": "OmniRoute", "tag": "steps 2-3" },
+    { "id": "docker_exec",  "lane": "infra_lane",  "col": 4, "type": "cloud",    "label": "Docker Exec",    "sublabel": "Sandboxed SQL" },
+    { "id": "judge",        "lane": "engine_lane", "col": 4, "type": "security", "label": "LLM Judge",      "sublabel": "OmniRoute eval" },
+    { "id": "session_save", "lane": "infra_lane",  "col": 5, "type": "database", "label": "Session Save",   "sublabel": "SQLite persist" },
+    { "id": "display",      "lane": "user_lane",   "col": 5, "type": "frontend", "label": "Show Result",    "sublabel": "SQL + table" }
+  ],
+  "edges": [
+    { "id": "q-to-cache",    "from": "query_in",     "to": "cache_check",   "label": "submit" },
+    { "id": "cache-miss",    "from": "cache_check",  "to": "finetuned_gen", "label": "miss",   "variant": "dashed", "labelDx": -40 },
+    { "id": "cache-hit",     "from": "cache_check",  "to": "cache_hit",     "label": "hit",    "variant": "dashed", "route": "drop", "labelSegment": 0, "labelDx": 28 },
+    { "id": "gen-step1",     "from": "finetuned_gen","to": "docker_exec",   "label": "SQL",    "variant": "emphasis", "labelDy": -18 },
+    { "id": "exec-judge",    "from": "docker_exec",  "to": "judge",         "label": "result", "route": "drop", "labelSegment": 0, "labelAt": [460, 415] },
+    { "id": "judge-pass",    "from": "judge",        "to": "display",       "label": "pass",   "variant": "emphasis" },
+    { "id": "judge-fail",    "from": "judge",        "to": "superior_gen",  "label": "retry",  "variant": "dashed", "labelDx": 50 },
+    { "id": "superior-exec", "from": "superior_gen", "to": "docker_exec",   "label": "SQL",    "labelDy": 18 },
+    { "id": "save-session",  "from": "display",      "to": "session_save",  "label": "save",   "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan",    "title": "Progressive Escalation", "items": ["Step 1: finetuned model is fast and cheap", "Steps 2-3: OmniRoute with error context on failure", "Error feedback loop for self-correction"] },
+    { "dot": "emerald", "title": "Execution Safety",       "items": ["Docker container with read-only DB copy", "SQL base64-encoded against injection", "Fallback to local SQLite when Docker unavailable"] },
+    { "dot": "amber",   "title": "Observability",          "items": ["Redis cache avoids redundant LLM calls", "Every attempt stored in SQLite sessions.db", "Langfuse spans available for trace debugging"] }
+  ]
+}
