@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.nl2sql/
+*.db
+dist/
+build/
+*.egg-info/
+.venv/
+db/
+grilling-handoff.md
