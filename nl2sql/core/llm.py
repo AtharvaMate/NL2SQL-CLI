@@ -4,7 +4,6 @@ import re
 
 import httpx
 
-
 FINETUNED_SYSTEM_PROMPT = (
     "You are a SQLite expert. Given a database schema and a question, "
     "write a single, syntactically correct SQLite query that answers the question. "
@@ -75,6 +74,13 @@ class LLMClient:
         self.token = token
         self.model = model
         self.timeout = timeout
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+
+    def _estimate_tokens(self, text: str | None) -> int:
+        if not text:
+            return 0
+        return int(len(text.split()) * 2.0)
 
     async def generate(
         self,
@@ -95,12 +101,21 @@ class LLMClient:
         if self.model:
             body["model"] = self.model
 
+        # Estimate input tokens
+        input_text = " ".join(m.get("content") or "" for m in messages)
+        input_tokens = self._estimate_tokens(input_text)
+        self.total_input_tokens += input_tokens
+
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             resp = await client.post(self.endpoint, json=body, headers=headers)
             resp.raise_for_status()
             data = resp.json()
 
-        return data["choices"][0]["message"]["content"]
+        output_text = data["choices"][0]["message"].get("content") or ""
+        output_tokens = self._estimate_tokens(output_text)
+        self.total_output_tokens += output_tokens
+
+        return output_text
 
     async def generate_sql(
         self,
@@ -178,5 +193,12 @@ class LLMClient:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 resp = await client.post(self.endpoint, json=body, headers=headers)
                 return resp.status_code == 200
-        except Exception:
+        except (httpx.HTTPError, httpx.TimeoutException):
             return False
+
+    def get_token_usage(self) -> dict:
+        return {
+            "input": self.total_input_tokens,
+            "output": self.total_output_tokens,
+            "total": self.total_input_tokens + self.total_output_tokens,
+        }

@@ -1,0 +1,470 @@
+test_id,question,expected_sql,final_sql,correct,attempts,finetuned_calls,superior_calls,judge_calls,time_sec,cost_usd,error
+1,How many customers are there?,SELECT COUNT(*) FROM customers,SELECT COUNT(*) FROM customers;,True,1,0,1,1,0.65,0.00354,
+2,List all product names,SELECT name FROM products,SELECT name FROM products;,True,1,0,1,1,0.66,0.003525,
+3,What products are in the Electronics category?,SELECT name FROM products WHERE category = 'Electronics',"SELECT product_id, name, category, price, stock
+FROM products
+WHERE category = 'Electronics';",True,1,0,1,1,0.61,0.004335,
+4,Show customers from USA,SELECT name FROM customers WHERE country = 'USA',"SELECT *
+FROM customers
+WHERE country = 'USA';",True,1,0,1,1,0.63,0.0039,
+5,What is the total number of orders?,SELECT COUNT(*) FROM orders,SELECT COUNT(*) AS total_orders FROM orders;,True,1,0,1,1,1.01,0.003735,
+6,What is the average product price?,SELECT AVG(price) FROM products,SELECT AVG(price) FROM products;,True,1,0,1,1,1.05,0.00357,
+7,What is the total revenue from all orders?,SELECT SUM(total_amount) FROM orders,SELECT SUM(total_amount) AS total_revenue FROM orders;,True,1,0,1,1,0.65,0.00375,
+8,How many orders were placed in 2024?,SELECT COUNT(*) FROM orders WHERE order_date LIKE '2024%',"SELECT COUNT(*) AS order_count
+FROM orders
+WHERE strftime('%Y', order_date) = '2024';",True,1,0,1,1,0.68,0.00426,
+9,List products with price over 100,SELECT name FROM products WHERE price > 100,"SELECT product_id, name, category, price, stock
+FROM products
+WHERE price > 100;",True,1,0,1,1,0.74,0.00432,
+10,What is the most expensive product?,SELECT name FROM products ORDER BY price DESC LIMIT 1,"SELECT name, price
+FROM products
+ORDER BY price DESC
+LIMIT 1;",True,1,0,1,1,0.67,0.004245,
+11,How many products are in each category?,SELECT category FROM products GROUP BY category,"SELECT category, COUNT(*) AS product_count
+FROM products
+GROUP BY category;",True,1,0,1,1,0.82,0.004185,
+12,What is the total quantity sold per product?,SELECT product_id FROM orders GROUP BY product_id,"SELECT p.product_id, p.name, SUM(o.quantity) AS total_quantity_sold
+FROM products p
+LEFT JOIN orders o ON p.product_id = o.product_id
+GROUP BY p.product_id, p.name
+ORDER BY total_quantity_sold DESC;",True,1,0,1,1,0.9,0.005625,
+13,Show customers who signed up in 2024,SELECT name FROM customers WHERE signup_date LIKE '2024%',"SELECT *
+FROM customers
+WHERE signup_date LIKE '2024%';",True,1,0,1,1,1.26,0.00396,
+14,What are the top 3 most expensive products?,SELECT name FROM products ORDER BY price DESC LIMIT 3,"SELECT product_id, name, category, price
+FROM products
+ORDER BY price DESC
+LIMIT 3;",True,1,0,1,1,0.87,0.004425,
+15,How many orders did customer 1 place?,SELECT COUNT(*) FROM orders WHERE customer_id = 1,SELECT COUNT(*) FROM orders WHERE customer_id = 1;,True,1,0,1,1,0.74,0.00396,
+16,What is the average order amount?,SELECT AVG(total_amount) FROM orders,SELECT AVG(total_amount) AS average_order_amount FROM orders;,True,1,0,1,1,0.72,0.00372,
+17,List products that are low in stock (less than 100),SELECT name FROM products WHERE stock < 100,"SELECT product_id, name, category, price, stock
+FROM products
+WHERE stock < 100
+ORDER BY stock ASC;",True,1,0,1,1,0.79,0.00477,
+18,Show all orders with their customer names,SELECT customers.name FROM orders JOIN customers ON orders.customer_id = customers.customer_id,"SELECT o.order_id, c.name AS customer_name, o.product_id, o.quantity, o.order_date, o.total_amount
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id;",True,1,0,1,1,0.45,0.00501,
+19,List orders with product names,SELECT products.name FROM orders JOIN products ON orders.product_id = products.product_id,"SELECT o.order_id, o.customer_id, p.name AS product_name, o.quantity, o.order_date, o.total_amount
+FROM orders o
+JOIN products p ON o.product_id = p.product_id",True,1,0,1,1,0.63,0.004965,
+20,Show customer names and their order totals,SELECT customers.name FROM orders JOIN customers ON orders.customer_id = customers.customer_id,"SELECT c.name, SUM(o.total_amount) AS order_total
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name;",True,1,0,1,1,0.52,0.00501,
+21,What products did Alice Johnson order?,SELECT products.name FROM orders JOIN customers ON orders.customer_id = customers.customer_id JOIN products ON orders.product_id = products.product_id WHERE customers.name = 'Alice Johnson',"SELECT DISTINCT p.product_id, p.name, p.category, p.price
+FROM products p
+JOIN orders o ON p.product_id = o.product_id
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.name = 'Alice Johnson'",True,1,0,1,1,0.26,0.005895,
+22,How many orders per customer?,SELECT customer_id FROM orders GROUP BY customer_id,"SELECT c.customer_id, c.name, COUNT(o.order_id) AS order_count
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name
+ORDER BY order_count DESC",True,1,0,1,1,0.43,0.005565,
+23,Which customer spent the most money?,SELECT customer_id FROM orders GROUP BY customer_id ORDER BY SUM(total_amount) DESC LIMIT 1,"SELECT c.customer_id, c.name, SUM(o.total_amount) AS total_spent
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name
+ORDER BY total_spent DESC
+LIMIT 1;",True,1,0,1,1,0.9,0.00567,
+24,What is the total revenue per product category?,SELECT products.category FROM orders JOIN products ON orders.product_id = products.product_id GROUP BY products.category,"SELECT p.category, SUM(o.total_amount) AS total_revenue
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+GROUP BY p.category
+ORDER BY total_revenue DESC;",True,1,0,1,1,0.5,0.005325,
+25,List customers who never ordered,SELECT name FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders),"SELECT c.customer_id, c.name, c.email, c.country, c.signup_date
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL",True,1,0,1,1,0.41,0.00519,
+26,What is the average quantity per order?,SELECT AVG(quantity) FROM orders,"SELECT AVG(quantity) AS average_quantity_per_order
+FROM orders;",True,1,0,1,1,0.41,0.003735,
+27,Show orders from 2024 with customer details,SELECT customers.name FROM orders JOIN customers ON orders.customer_id = customers.customer_id WHERE orders.order_date LIKE '2024%',"SELECT 
+    o.order_id,
+    o.order_date,
+    o.quantity,
+    o.total_amount,
+    c.customer_id,
+    c.name AS customer_name,
+    c.email,
+    c.country
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE strftime('%Y', o.order_date) = '2024'
+ORDER BY o.order_date ASC;",True,1,0,1,1,0.43,0.006135,
+28,How many Electronics products were sold?,SELECT SUM(orders.quantity) FROM orders JOIN products ON orders.product_id = products.product_id WHERE products.category = 'Electronics',"SELECT SUM(o.quantity) AS total_electronics_sold
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+WHERE p.category = 'Electronics'",True,1,0,1,1,0.42,0.00492,
+29,What is the total stock value of all products?,SELECT SUM(price * stock) FROM products,SELECT SUM(price * stock) AS total_stock_value FROM products;,True,1,0,1,1,0.43,0.004005,
+30,Which products have never been ordered?,SELECT name FROM products WHERE product_id NOT IN (SELECT product_id FROM orders),"SELECT p.product_id, p.name, p.category, p.price, p.stock
+FROM products p
+LEFT JOIN orders o ON p.product_id = o.product_id
+WHERE o.order_id IS NULL",True,1,0,1,1,0.42,0.00522,
+31,Show orders above average amount,SELECT order_id FROM orders WHERE total_amount > (SELECT AVG(total_amount) FROM orders),"SELECT *
+FROM orders
+WHERE total_amount > (SELECT AVG(total_amount) FROM orders);",True,1,0,1,1,0.48,0.004215,
+32,List customers and their total spending,SELECT customer_id FROM orders GROUP BY customer_id,"SELECT c.customer_id, c.name, c.email, c.country, COALESCE(SUM(o.total_amount), 0) AS total_spending
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name, c.email, c.country
+ORDER BY total_spending DESC",True,1,0,1,1,0.54,0.00612,
+33,What is the most popular product by order count?,SELECT product_id FROM orders GROUP BY product_id ORDER BY COUNT(*) DESC LIMIT 1,"SELECT p.product_id, p.name, COUNT(o.order_id) AS order_count
+FROM products p
+JOIN orders o ON p.product_id = o.product_id
+GROUP BY p.product_id, p.name
+ORDER BY order_count DESC
+LIMIT 1;",True,1,0,1,1,0.48,0.00573,
+34,Show the latest order date,SELECT MAX(order_date) FROM orders,"SELECT MAX(order_date) AS latest_order_date
+FROM orders;",True,1,0,1,1,0.47,0.00369,
+35,How many customers per country?,SELECT country FROM customers GROUP BY country,"SELECT country, COUNT(customer_id) AS customer_count
+FROM customers
+GROUP BY country
+ORDER BY customer_count DESC;",True,1,0,1,1,0.37,0.004515,
+36,How many employees are there?,SELECT COUNT(*) FROM employees,SELECT COUNT(*) FROM employees;,True,1,0,1,1,0.3,0.00357,
+37,List all department names,SELECT dept_name FROM departments,SELECT dept_name FROM departments;,True,1,0,1,1,0.34,0.00354,
+38,Show employees in Engineering department,SELECT name FROM employees WHERE dept_id = 1,"SELECT e.employee_id, e.name, e.salary, e.hire_date
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+WHERE d.dept_name = 'Engineering';",True,1,0,1,1,0.39,0.004995,
+39,What is the average employee salary?,SELECT AVG(salary) FROM employees,SELECT AVG(salary) FROM employees;,True,1,0,1,1,0.49,0.003585,
+40,Who is the highest paid employee?,SELECT name FROM employees ORDER BY salary DESC LIMIT 1,"SELECT name, salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 1;",True,1,0,1,1,0.37,0.00426,
+41,How many employees per department?,SELECT dept_id FROM employees GROUP BY dept_id,"SELECT d.dept_name, COUNT(e.employee_id) AS employee_count
+FROM departments d
+LEFT JOIN employees e ON d.dept_id = e.dept_id
+GROUP BY d.dept_id, d.dept_name
+ORDER BY employee_count DESC;",True,1,0,1,1,0.33,0.00552,
+42,List employees hired in 2024,SELECT name FROM employees WHERE hire_date LIKE '2024%',"SELECT employee_id, name, dept_id, salary, hire_date
+FROM employees
+WHERE strftime('%Y', hire_date) = '2024';",True,1,0,1,1,0.38,0.004395,
+43,What is the total payroll for January 2024?,SELECT SUM(amount) FROM payroll WHERE month = '2024-01',"SELECT SUM(amount + COALESCE(bonus, 0)) AS total_payroll
+FROM payroll
+WHERE month = '2024-01';",True,1,0,1,1,0.34,0.004455,
+44,Show employees with salary over 100000,SELECT name FROM employees WHERE salary > 100000,"SELECT employee_id, name, dept_id, salary, hire_date, manager_id
+FROM employees
+WHERE salary > 100000;",True,1,0,1,1,0.34,0.00441,
+45,List employees and their department names,SELECT employees.name FROM employees JOIN departments ON employees.dept_id = departments.dept_id,"SELECT e.employee_id, e.name, d.dept_name
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.dept_id;",True,1,0,1,1,0.36,0.004635,
+46,Which department is in San Francisco?,SELECT dept_name FROM departments WHERE location = 'San Francisco',SELECT dept_name FROM departments WHERE location = 'San Francisco';,True,1,0,1,1,0.67,0.004035,
+47,Show all employees and their managers,SELECT e.name FROM employees e JOIN employees m ON e.manager_id = m.employee_id,"SELECT 
+    e.employee_id,
+    e.name AS employee_name,
+    e.dept_id,
+    m.employee_id AS manager_id,
+    m.name AS manager_name
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.employee_id;",True,1,0,1,1,0.38,0.005385,
+48,What is the total salary by department?,SELECT dept_id FROM employees GROUP BY dept_id,"SELECT d.dept_name, SUM(e.salary) AS total_salary
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+GROUP BY d.dept_id, d.dept_name;",True,1,0,1,1,0.35,0.005025,
+49,How many employees have managers?,SELECT COUNT(*) FROM employees WHERE manager_id IS NOT NULL,SELECT COUNT(*) FROM employees WHERE manager_id IS NOT NULL;,True,1,0,1,1,0.32,0.00402,
+50,List employees without managers,SELECT name FROM employees WHERE manager_id IS NULL,"SELECT employee_id, name, dept_id, salary, hire_date
+FROM employees
+WHERE manager_id IS NULL;",True,1,0,1,1,0.31,0.00429,
+51,What is the average salary in Engineering?,SELECT AVG(salary) FROM employees WHERE dept_id = 1,"SELECT AVG(e.salary)
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+WHERE d.dept_name = 'Engineering'",True,1,0,1,1,0.3,0.004725,
+52,Show total bonuses paid in January 2024,SELECT SUM(bonus) FROM payroll WHERE month = '2024-01',"SELECT SUM(bonus) AS total_bonuses
+FROM payroll
+WHERE month = '2024-01';",True,1,0,1,1,0.34,0.0042,
+53,Which employee received the highest bonus?,SELECT employee_id FROM payroll ORDER BY bonus DESC LIMIT 1,"SELECT e.name, p.bonus
+FROM employees e
+JOIN payroll p ON e.employee_id = p.employee_id
+ORDER BY p.bonus DESC
+LIMIT 1;",True,1,0,1,1,0.33,0.00501,
+54,List departments with more than 2 employees,SELECT dept_id FROM employees GROUP BY dept_id HAVING COUNT(*) > 2,"SELECT d.dept_id, d.dept_name, COUNT(e.employee_id) AS employee_count
+FROM departments d
+JOIN employees e ON d.dept_id = e.dept_id
+GROUP BY d.dept_id, d.dept_name
+HAVING COUNT(e.employee_id) > 2",True,1,0,1,1,0.38,0.00555,
+55,Show employees hired before 2023,SELECT name FROM employees WHERE hire_date < '2023-01-01',"SELECT employee_id, name, dept_id, salary, hire_date, manager_id
+FROM employees
+WHERE hire_date < '2023-01-01';",True,1,0,1,1,0.37,0.004395,
+56,What is the total compensation (salary + bonus) for each employee in Jan 2024?,SELECT employee_id FROM payroll WHERE month = '2024-01',"SELECT e.employee_id, e.name, e.salary + COALESCE(p.bonus, 0) AS total_compensation
+FROM employees e
+JOIN payroll p ON e.employee_id = p.employee_id
+WHERE p.month = '2024-01'",True,1,0,1,1,0.42,0.005535,
+57,List Engineering employees with their salaries,SELECT employees.name FROM employees JOIN departments ON employees.dept_id = departments.dept_id WHERE departments.dept_name = 'Engineering',"SELECT e.employee_id, e.name, e.salary
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+WHERE d.dept_name = 'Engineering';",True,1,0,1,1,0.55,0.004935,
+58,How many payroll entries per employee?,SELECT employee_id FROM payroll GROUP BY employee_id,"SELECT e.employee_id, e.name, COUNT(p.payroll_id) AS payroll_count
+FROM employees e
+LEFT JOIN payroll p ON e.employee_id = p.employee_id
+GROUP BY e.employee_id, e.name
+ORDER BY payroll_count DESC;",True,1,0,1,1,0.71,0.00561,
+59,Show employees earning more than their department average,SELECT e.name FROM employees e WHERE e.salary > (SELECT AVG(salary) FROM employees WHERE dept_id = e.dept_id),"SELECT e.employee_id, e.name, e.salary, e.dept_id, dept_avg.avg_salary
+FROM employees e
+JOIN (
+    SELECT dept_id, AVG(salary) AS avg_salary
+    FROM employees
+    GROUP BY dept_id
+) AS dept_avg ON e.dept_id = dept_avg.dept_id
+WHERE e.salary > dept_avg.avg_salary;",True,1,0,1,1,0.58,0.00633,
+60,What is the difference between highest and lowest salary?,SELECT MAX(salary) - MIN(salary) FROM employees,SELECT MAX(salary) - MIN(salary) AS salary_difference FROM employees;,True,1,0,1,1,0.48,0.00402,
+61,List all customers and their countries,"SELECT name, country FROM customers","SELECT name, country FROM customers",True,1,0,1,1,6.19,0.003645,
+62,What is the cheapest product?,SELECT name FROM products ORDER BY price ASC LIMIT 1,"SELECT name, price
+FROM products
+ORDER BY price ASC
+LIMIT 1;",True,1,0,1,1,4.96,0.004215,
+63,How many products are out of stock?,SELECT COUNT(*) FROM products WHERE stock = 0,SELECT COUNT(*) FROM products WHERE stock = 0;,True,1,0,1,1,3.91,0.00396,
+64,Show orders placed in January 2024,SELECT order_id FROM orders WHERE order_date LIKE '2024-01%',"SELECT *
+FROM orders
+WHERE order_date >= '2024-01-01'
+  AND order_date <= '2024-01-31'",True,1,0,1,1,4.54,0.00432,
+65,What countries do our customers come from?,SELECT DISTINCT country FROM customers,SELECT DISTINCT country FROM customers WHERE country IS NOT NULL ORDER BY country;,True,1,0,1,1,3.32,0.00441,
+66,Show total quantity sold across all orders,SELECT SUM(quantity) FROM orders,"SELECT SUM(quantity) AS total_quantity_sold
+FROM orders;",True,1,0,1,1,3.7,0.003735,
+67,List products with stock between 50 and 150,SELECT name FROM products WHERE stock BETWEEN 50 AND 150,"SELECT product_id, name, category, price, stock
+FROM products
+WHERE stock BETWEEN 50 AND 150;",True,1,0,1,1,4.73,0.004575,
+68,Show the 2 most recent orders,SELECT order_id FROM orders ORDER BY order_date DESC LIMIT 2,"SELECT
+    o.order_id,
+    o.customer_id,
+    c.name AS customer_name,
+    o.product_id,
+    p.name AS product_name,
+    o.quantity,
+    o.order_date,
+    o.total_amount
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN products p ON o.product_id = p.product_id
+ORDER BY o.order_date DESC
+LIMIT 2;",True,1,0,1,1,3.83,0.006645,
+69,How many orders does each product have?,"SELECT product_id, COUNT(*) FROM orders GROUP BY product_id","SELECT p.product_id, p.name, COUNT(o.order_id) AS order_count
+FROM products p
+LEFT JOIN orders o ON p.product_id = o.product_id
+GROUP BY p.product_id, p.name",True,1,0,1,1,3.51,0.005235,
+70,What is the total revenue for Electronics?,SELECT SUM(orders.total_amount) FROM orders JOIN products ON orders.product_id = products.product_id WHERE products.category = 'Electronics',"SELECT SUM(o.total_amount) AS total_revenue
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+WHERE p.category = 'Electronics'",True,1,0,1,1,3.72,0.004935,
+71,List customers whose name starts with A,SELECT name FROM customers WHERE name LIKE 'A%',"SELECT customer_id, name, email, country, signup_date
+FROM customers
+WHERE name LIKE 'A%';",True,1,0,1,1,3.44,0.004335,
+72,Show orders with quantity greater than 1,SELECT order_id FROM orders WHERE quantity > 1,SELECT * FROM orders WHERE quantity > 1,True,1,0,1,1,3.12,0.00396,
+73,What is the maximum single order amount?,SELECT MAX(total_amount) FROM orders,SELECT MAX(total_amount) FROM orders;,True,1,0,1,1,3.36,0.003585,
+74,List all products ordered by price descending,SELECT name FROM products ORDER BY price DESC,"SELECT product_id, name, category, price, stock
+FROM products
+ORDER BY price DESC;",True,1,0,1,1,3.84,0.004335,
+75,How many customers are from Europe (UK or Germany)?,"SELECT COUNT(*) FROM customers WHERE country IN ('UK', 'Germany')","SELECT COUNT(*) FROM customers WHERE country IN ('UK', 'Germany');",True,1,0,1,1,3.85,0.00408,
+76,Show customer emails and signup dates,"SELECT email, signup_date FROM customers","SELECT email, signup_date
+FROM customers;",True,1,0,1,1,3.68,0.003645,
+77,What is the minimum product price?,SELECT MIN(price) FROM products,SELECT MIN(price) FROM products;,True,1,0,1,1,4.11,0.00357,
+78,List orders with their product names and quantities,"SELECT products.name, orders.quantity FROM orders JOIN products ON orders.product_id = products.product_id","SELECT o.order_id, p.name AS product_name, o.quantity
+FROM orders o
+JOIN products p ON o.product_id = p.product_id;",True,1,0,1,1,2.97,0.004725,
+79,How many orders were placed per month in 2024?,"SELECT SUBSTR(order_date,1,7), COUNT(*) FROM orders WHERE order_date LIKE '2024%' GROUP BY SUBSTR(order_date,1,7)","SELECT strftime('%m', order_date) AS month,
+       COUNT(*) AS order_count
+FROM orders
+WHERE strftime('%Y', order_date) = '2024'
+GROUP BY strftime('%m', order_date)
+ORDER BY month;",True,1,0,1,1,3.41,0.005355,
+80,Which products have more than 100 units in stock?,SELECT name FROM products WHERE stock > 100,"SELECT product_id, name, category, price, stock
+FROM products
+WHERE stock > 100;",True,1,0,1,1,2.62,0.00438,
+81,Show the total number of products per category,"SELECT category, COUNT(*) FROM products GROUP BY category","SELECT category, COUNT(*) AS total_products
+FROM products
+GROUP BY category;",True,1,0,1,1,2.73,0.0042,
+82,What is the average order quantity?,SELECT AVG(quantity) FROM orders,SELECT AVG(quantity) AS average_order_quantity FROM orders;,True,1,0,1,1,3.63,0.00372,
+83,List customers who have placed more than one order,SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1,"SELECT c.customer_id, c.name, c.email, COUNT(o.order_id) AS order_count
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name, c.email
+HAVING COUNT(o.order_id) > 1",True,1,0,1,1,3.22,0.00573,
+84,What is the total stock across all products?,SELECT SUM(stock) FROM products,SELECT SUM(stock) AS total_stock FROM products;,True,1,0,1,1,3.83,0.00375,
+85,Show orders where total amount exceeds 500,SELECT order_id FROM orders WHERE total_amount > 500,"SELECT
+    order_id,
+    customer_id,
+    product_id,
+    quantity,
+    order_date,
+    total_amount
+FROM orders
+WHERE total_amount > 500;",True,1,0,1,1,3.35,0.00441,
+86,List unique product categories,SELECT DISTINCT category FROM products,SELECT DISTINCT category FROM products;,True,1,0,1,1,3.14,0.0036,
+87,Which customer placed the most orders?,SELECT customer_id FROM orders GROUP BY customer_id ORDER BY COUNT(*) DESC LIMIT 1,"SELECT c.customer_id, c.name, COUNT(o.order_id) AS order_count
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name
+ORDER BY order_count DESC
+LIMIT 1;",True,1,0,1,1,4.87,0.00567,
+88,Show all orders sorted by total amount descending,"SELECT order_id, total_amount FROM orders ORDER BY total_amount DESC","SELECT
+    order_id,
+    customer_id,
+    product_id,
+    quantity,
+    order_date,
+    total_amount
+FROM orders
+ORDER BY total_amount DESC;",True,1,0,1,1,2.94,0.004425,
+89,What is the total revenue per customer?,"SELECT customer_id, SUM(total_amount) FROM orders GROUP BY customer_id","SELECT 
+    c.customer_id,
+    c.name,
+    SUM(o.total_amount) AS total_revenue
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name
+ORDER BY total_revenue DESC;",True,1,0,1,1,15.76,0.005535,
+90,How many orders were placed before 2024?,SELECT COUNT(*) FROM orders WHERE order_date < '2024-01-01',SELECT COUNT(*) FROM orders WHERE order_date < '2024-01-01';,True,1,0,1,1,4.09,0.00396,
+91,List all employee names and their salaries,"SELECT name, salary FROM employees","SELECT name, salary FROM employees;",True,1,0,1,1,3.03,0.003675,
+92,Which department has the most employees?,SELECT dept_id FROM employees GROUP BY dept_id ORDER BY COUNT(*) DESC LIMIT 1,"SELECT d.dept_name, COUNT(e.employee_id) AS employee_count
+FROM departments d
+JOIN employees e ON d.dept_id = e.dept_id
+GROUP BY d.dept_id, d.dept_name
+ORDER BY employee_count DESC
+LIMIT 1;",True,1,0,1,1,3.57,0.00561,
+93,Show employees hired in 2021,SELECT name FROM employees WHERE hire_date LIKE '2021%',"SELECT employee_id, name, dept_id, salary, hire_date
+FROM employees
+WHERE strftime('%Y', hire_date) = '2021';",True,1,0,1,1,3.42,0.004395,
+94,What is the total salary for the Engineering department?,SELECT SUM(salary) FROM employees WHERE dept_id = 1,"SELECT SUM(e.salary) AS total_salary
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+WHERE d.dept_name = 'Engineering';",True,1,0,1,1,3.55,0.004995,
+95,List departments and their locations,"SELECT dept_name, location FROM departments","SELECT dept_name, location FROM departments;",True,1,0,1,1,3.32,0.003645,
+96,Show employees who earn between 80000 and 120000,SELECT name FROM employees WHERE salary BETWEEN 80000 AND 120000,"SELECT employee_id, name, dept_id, salary
+FROM employees
+WHERE salary BETWEEN 80000 AND 120000;",True,1,0,1,1,4.17,0.004455,
+97,How many employees were hired each year?,"SELECT SUBSTR(hire_date,1,4), COUNT(*) FROM employees GROUP BY SUBSTR(hire_date,1,4)","SELECT strftime('%Y', hire_date) AS hire_year,
+       COUNT(*) AS employees_hired
+FROM employees
+GROUP BY hire_year
+ORDER BY hire_year;",True,1,0,1,1,4.0,0.004725,
+98,What is the minimum salary in the company?,SELECT MIN(salary) FROM employees,SELECT MIN(salary) FROM employees;,True,1,0,1,1,2.75,0.00363,
+99,List employees in Sales or Marketing departments,"SELECT name FROM employees WHERE dept_id IN (2,3)","SELECT e.employee_id, e.name, d.dept_name
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+WHERE d.dept_name IN ('Sales', 'Marketing');",True,1,0,1,1,3.41,0.005025,
+100,Show payroll records with employee names,"SELECT employees.name, payroll.amount FROM payroll JOIN employees ON payroll.employee_id = employees.employee_id","SELECT p.payroll_id, p.month, p.amount, p.bonus, e.name AS employee_name
+FROM payroll p
+JOIN employees e ON p.employee_id = e.employee_id;",True,1,0,1,1,3.22,0.004935,
+101,What is the highest salary in Engineering?,SELECT MAX(salary) FROM employees WHERE dept_id = 1,"SELECT MAX(e.salary)
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+WHERE d.dept_name = 'Engineering'",True,1,0,1,1,3.38,0.004725,
+102,How many employees report to manager with id 1?,SELECT COUNT(*) FROM employees WHERE manager_id = 1,"SELECT COUNT(*) AS employee_count
+FROM employees
+WHERE manager_id = 1;",True,1,0,1,1,2.52,0.004245,
+103,List employees and department names ordered by salary,"SELECT employees.name, departments.dept_name FROM employees JOIN departments ON employees.dept_id = departments.dept_id ORDER BY employees.salary DESC","SELECT e.employee_id, e.name, e.salary, d.dept_name
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.dept_id
+ORDER BY e.salary DESC;",True,1,0,1,1,3.96,0.005205,
+104,What is the average bonus paid in January 2024?,SELECT AVG(bonus) FROM payroll WHERE month = '2024-01',"SELECT AVG(bonus)
+FROM payroll
+WHERE month = '2024-01';",True,1,0,1,1,3.11,0.00402,
+105,Show all departments with no employees,SELECT dept_name FROM departments WHERE dept_id NOT IN (SELECT dept_id FROM employees),"SELECT d.dept_id, d.dept_name, d.location
+FROM departments d
+LEFT JOIN employees e ON d.dept_id = e.dept_id
+WHERE e.employee_id IS NULL",True,1,0,1,1,3.02,0.00501,
+106,What is the total payroll amount per employee?,"SELECT employee_id, SUM(amount) FROM payroll GROUP BY employee_id","SELECT e.employee_id, e.name, SUM(p.amount) AS total_payroll_amount
+FROM employees e
+JOIN payroll p ON e.employee_id = p.employee_id
+GROUP BY e.employee_id, e.name;",True,1,0,1,1,3.6,0.005205,
+107,List employees whose name contains Dev,SELECT name FROM employees WHERE name LIKE '%Dev%',"SELECT employee_id, name, dept_id, salary, hire_date, manager_id
+FROM employees
+WHERE name LIKE '%Dev%';",True,1,0,1,1,3.26,0.00441,
+108,What is the salary range per department?,"SELECT dept_id, MAX(salary) - MIN(salary) FROM employees GROUP BY dept_id","SELECT
+    d.dept_name,
+    MIN(e.salary) AS min_salary,
+    MAX(e.salary) AS max_salary,
+    MAX(e.salary) - MIN(e.salary) AS salary_range
+FROM departments d
+JOIN employees e ON d.dept_id = e.dept_id
+GROUP BY d.dept_id, d.dept_name
+ORDER BY d.dept_name;",True,1,0,1,1,4.03,0.00615,
+109,Show employees hired after 2022 with salary over 100000,SELECT name FROM employees WHERE hire_date > '2022-12-31' AND salary > 100000,"SELECT employee_id, name, dept_id, salary, hire_date
+FROM employees
+WHERE hire_date > '2022-12-31'
+AND salary > 100000;",True,1,0,1,1,3.12,0.00477,
+110,How many total payroll entries are there?,SELECT COUNT(*) FROM payroll,SELECT COUNT(*) FROM payroll;,True,1,0,1,1,3.5,0.0036,
+111,How many books are in the library?,SELECT COUNT(*) FROM books,SELECT COUNT(*) AS total_books FROM books;,True,1,0,1,1,3.02,0.00381,
+112,List all book titles,SELECT title FROM books,SELECT title FROM books;,True,1,0,1,1,2.77,0.0036,
+113,How many members does the library have?,SELECT COUNT(*) FROM members,SELECT COUNT(*) FROM members;,True,1,0,1,1,3.08,0.00366,
+114,Show all available books,SELECT title FROM books WHERE available_copies > 0,"SELECT 
+    book_id,
+    title,
+    author,
+    genre,
+    published_year,
+    total_copies,
+    available_copies
+FROM books
+WHERE available_copies > 0;",True,1,0,1,1,3.12,0.004575,
+115,Which books are currently unavailable?,SELECT title FROM books WHERE available_copies = 0,"SELECT title, author, total_copies, available_copies
+FROM books
+WHERE available_copies = 0;",True,1,0,1,1,4.12,0.004305,
+116,List Technology books,SELECT title FROM books WHERE genre = 'Technology',"SELECT *
+FROM books
+WHERE genre = 'Technology';",True,1,0,1,1,2.94,0.00396,
+117,How many books per genre?,"SELECT genre, COUNT(*) FROM books GROUP BY genre","SELECT genre, COUNT(*) AS book_count
+FROM books
+GROUP BY genre
+ORDER BY book_count DESC;",True,1,0,1,1,2.99,0.004605,
+118,Who are the Premium members?,SELECT name FROM members WHERE membership_type = 'Premium',"SELECT name, email, join_date, membership_type
+FROM members
+WHERE membership_type = 'Premium';",True,1,0,1,1,4.8,0.004305,
+119,Show the oldest book,SELECT title FROM books ORDER BY published_year ASC LIMIT 1,SELECT * FROM books ORDER BY published_year ASC LIMIT 1;,True,1,0,1,1,4.63,0.0042,
+120,How many total copies exist across all books?,SELECT SUM(total_copies) FROM books,SELECT SUM(total_copies) AS total_copies FROM books;,True,1,0,1,1,3.61,0.00384,
+121,List books published after 2000,SELECT title FROM books WHERE published_year > 2000,SELECT * FROM books WHERE published_year > 2000,True,1,0,1,1,3.53,0.004005,
+122,Show all active loans,SELECT loan_id FROM loans WHERE return_date IS NULL,"SELECT 
+    l.loan_id,
+    b.title AS book_title,
+    b.author,
+    m.name AS member_name,
+    m.email,
+    l.loan_date,
+    l.due_date
+FROM loans l
+JOIN books b ON l.book_id = b.book_id
+JOIN members m ON l.member_id = m.member_id
+WHERE l.return_date IS NULL;",True,1,0,1,1,5.44,0.006375,
+123,How many loans have been returned?,SELECT COUNT(*) FROM loans WHERE return_date IS NOT NULL,"SELECT COUNT(*) AS returned_loans
+FROM loans
+WHERE return_date IS NOT NULL;",True,1,0,1,1,3.31,0.00432,
+124,List loans with book titles,SELECT books.title FROM loans JOIN books ON loans.book_id = books.book_id,"SELECT l.loan_id, b.title, l.member_id, l.loan_date, l.due_date, l.return_date
+FROM loans l
+JOIN books b ON l.book_id = b.book_id",True,1,0,1,1,3.41,0.004905,
+125,Show loans with member names,SELECT members.name FROM loans JOIN members ON loans.member_id = members.member_id,"SELECT l.loan_id, m.name, l.book_id, l.loan_date, l.due_date, l.return_date
+FROM loans l
+JOIN members m ON l.member_id = m.member_id;",True,1,0,1,1,3.52,0.004905,
+126,Which member has borrowed the most books?,SELECT member_id FROM loans GROUP BY member_id ORDER BY COUNT(*) DESC LIMIT 1,"SELECT m.member_id, m.name, COUNT(l.loan_id) AS total_books_borrowed
+FROM members m
+JOIN loans l ON m.member_id = l.member_id
+GROUP BY m.member_id, m.name
+ORDER BY total_books_borrowed DESC
+LIMIT 1;",True,1,0,1,1,4.49,0.00576,
+127,List books that have never been loaned,SELECT title FROM books WHERE book_id NOT IN (SELECT book_id FROM loans),"SELECT b.book_id, b.title, b.author, b.genre, b.published_year
+FROM books b
+LEFT JOIN loans l ON b.book_id = l.book_id
+WHERE l.loan_id IS NULL",True,1,0,1,1,4.26,0.00531,
+128,How many books did each member borrow?,"SELECT member_id, COUNT(*) FROM loans GROUP BY member_id","SELECT m.member_id, m.name, COUNT(l.loan_id) AS books_borrowed
+FROM members m
+LEFT JOIN loans l ON m.member_id = l.member_id
+GROUP BY m.member_id, m.name
+ORDER BY books_borrowed DESC;",True,1,0,1,1,4.12,0.005685,
+129,Show overdue loans,SELECT loan_id FROM loans WHERE return_date > due_date,"SELECT 
+    l.loan_id,
+    m.name AS member_name,
+    m.email AS member_email,
+    b.title AS book_title,
+    b.author,
+    l.loan_date,
+    l.due_date,
+    CAST(JULIANDAY('now') - JULIANDAY(l.due_date) AS INTEGER) AS days_overdue
+FROM loans l
+JOIN members m ON l.member_id = m.member_id
+JOIN books b ON l.book_id = b.book_id
+WHERE l.return_date IS NULL
+  AND l.due_date < DATE('now')
+ORDER BY days_overdue DESC;",True,1,0,1,1,5.0,0.008085,
+130,What is the most popular genre by total copies?,SELECT genre FROM books GROUP BY genre ORDER BY SUM(total_copies) DESC LIMIT 1,"SELECT genre, SUM(total_copies) AS total_copies_count
+FROM books
+GROUP BY genre
+ORDER BY total_copies_count DESC
+LIMIT 1",True,1,0,1,1,3.68,0.00483,

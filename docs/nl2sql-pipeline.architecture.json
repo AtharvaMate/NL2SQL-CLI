@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "NL2SQL CLI — Agentic Multi-Agent Pipeline",
+    "output": "docs/architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "parallel-fanout",
+        "label": "Parallel fan-out",
+        "focus": ["user", "tui", "parallel_start", "cache_lookup", "schema_analyzer", "dispatch"],
+        "note": "LangGraph fans out to Redis cache lookup and schema analysis simultaneously. The fan-in waits for both before routing."
+      },
+      {
+        "id": "generation-loop",
+        "label": "Generation & retry loop",
+        "focus": ["dispatch", "finetuned_gen", "syntax_validator", "executor", "judge", "superior_gen"],
+        "note": "Finetuned model runs first. Syntax, execution, or judge failures escalate to the superior model with full error context."
+      },
+      {
+        "id": "output-path",
+        "label": "Output & observability",
+        "focus": ["perf_optimizer", "privacy_guard", "redis", "session_db", "langfuse"],
+        "note": "Successful SQL is optimized, PII-redacted, cached in Redis, persisted to sessions.db, and traced to Langfuse."
+      }
+    ]
+  },
+  "components": [
+    { "id": "user",             "type": "external",  "label": "User",                "sublabel": "NL question",           "pos": [30,  310], "size": [110, 54] },
+    { "id": "tui",              "type": "frontend",  "label": "TUI / CLI",           "sublabel": "nl2sql  ·  query",      "pos": [190, 310], "size": [120, 54] },
+    { "id": "parallel_start",   "type": "backend",   "label": "parallel_start",      "sublabel": "fan-out node",          "pos": [370, 310], "size": [130, 54], "tag": "LangGraph entry" },
+
+    { "id": "cache_lookup",     "type": "database",  "label": "cache_lookup",        "sublabel": "Agent · Redis GET",     "pos": [570, 180], "size": [138, 54], "tag": "branch 1" },
+    { "id": "schema_analyzer",  "type": "backend",   "label": "schema_analyzer",     "sublabel": "Agent · Groq LLM",      "pos": [570, 430], "size": [138, 54], "tag": "branch 2" },
+
+    { "id": "dispatch",         "type": "security",  "label": "dispatch_or_skip",    "sublabel": "fan-in gate",           "pos": [770, 310], "size": [138, 54], "tag": "hit → skip LLMs" },
+
+    { "id": "finetuned_gen",    "type": "backend",   "label": "finetuned_generator", "sublabel": "Qwen2.5-1.5B · HF",    "pos": [970, 160], "size": [148, 54], "tag": "Step 1" },
+    { "id": "syntax_validator", "type": "security",  "label": "syntax_validator",    "sublabel": "sqlglot · SELECT-only", "pos": [970, 310], "size": [148, 54] },
+    { "id": "executor",         "type": "cloud",     "label": "executor",            "sublabel": "DockerSandbox",         "pos": [970, 460], "size": [148, 54], "tag": "read-only" },
+
+    { "id": "superior_gen",     "type": "backend",   "label": "superior_generator",  "sublabel": "OmniRoute · error ctx", "pos": [1160, 220], "size": [146, 54], "tag": "Steps 2-3" },
+    { "id": "judge",            "type": "security",  "label": "judge",               "sublabel": "Groq qwen3.8-27b",     "pos": [1160, 460], "size": [146, 54], "tag": "LLM-as-judge" },
+
+    { "id": "perf_optimizer",   "type": "backend",   "label": "perf_optimizer",      "sublabel": "llama-3.3-70b rewrite","pos": [970, 640], "size": [148, 54], "tag": "complex SQL" },
+    { "id": "privacy_guard",    "type": "security",  "label": "privacy_guard",       "sublabel": "PII redact · audit log","pos": [760, 640], "size": [144, 54] },
+
+    { "id": "redis",            "type": "database",  "label": "Redis",               "sublabel": "Cache · 1-hr TTL",      "pos": [760,  820], "size": [144, 52] },
+    { "id": "session_db",       "type": "database",  "label": "sessions.db",         "sublabel": "SQLite history",        "pos": [570,  820], "size": [144, 52] },
+    { "id": "langfuse",         "type": "cloud",     "label": "Langfuse",            "sublabel": "LLM tracing · optional","pos": [370,  820], "size": [144, 52] }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in",
+      "wraps": ["parallel_start", "cache_lookup", "schema_analyzer", "dispatch",
+                "finetuned_gen", "syntax_validator", "executor",
+                "superior_gen", "judge", "perf_optimizer", "privacy_guard"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Observability layer  (all degrade gracefully to no-op)",
+      "wraps": ["redis", "session_db", "langfuse"]
+    }
+  ],
+  "connections": [
+    { "id": "user-tui",        "from": "user",            "to": "tui",              "label": "question",   "variant": "emphasis" },
+    { "id": "tui-parallel",    "from": "tui",             "to": "parallel_start",   "label": "run()",      "variant": "emphasis" },
+
+    { "id": "ps-cache",        "from": "parallel_start",  "to": "cache_lookup",     "label": "concurrent", "variant": "emphasis", "fromSide": "top",    "toSide": "left",  "labelDy": -18 },
+    { "id": "ps-schema",       "from": "parallel_start",  "to": "schema_analyzer",  "label": "concurrent", "variant": "emphasis", "fromSide": "bottom", "toSide": "left",  "labelDy": 18 },
+
+    { "id": "cache-dispatch",  "from": "cache_lookup",    "to": "dispatch",         "label": "hit / miss", "fromSide": "right",  "toSide": "top" },
+    { "id": "schema-dispatch", "from": "schema_analyzer", "to": "dispatch",         "fromSide": "right",  "toSide": "bottom" },
+
+    { "id": "dispatch-skip",   "from": "dispatch",        "to": "privacy_guard",    "variant": "dashed",  "fromSide": "bottom", "toSide": "top" },
+    { "id": "dispatch-gen",    "from": "dispatch",        "to": "finetuned_gen",    "label": "cache miss", "variant": "emphasis","fromSide": "right",  "toSide": "left" },
+
+    { "id": "ft-syntax",       "from": "finetuned_gen",   "to": "syntax_validator", "fromSide": "bottom",  "toSide": "top" },
+    { "id": "syntax-exec",     "from": "syntax_validator","to": "executor",          "fromSide": "bottom",  "toSide": "top" },
+
+    { "id": "syntax-sup",      "from": "syntax_validator","to": "superior_gen",     "variant": "security", "fromSide": "right",  "toSide": "bottom" },
+    { "id": "exec-sup",        "from": "executor",        "to": "superior_gen",     "variant": "security", "fromSide": "right",  "toSide": "left" },
+    { "id": "judge-sup",       "from": "judge",           "to": "superior_gen",     "label": "retry",      "variant": "security","fromSide": "top",    "toSide": "bottom","labelDx": 24 },
+
+    { "id": "sup-syntax",      "from": "superior_gen",    "to": "syntax_validator", "variant": "dashed",   "fromSide": "left",   "toSide": "top",   "via": [[1090, 247], [1044, 247], [1044, 280]] },
+
+    { "id": "exec-judge",      "from": "executor",        "to": "judge",            "variant": "emphasis","fromSide": "right",  "toSide": "left",  "via": [[1160, 487], [1160, 487]] },
+    { "id": "judge-opt",       "from": "judge",           "to": "perf_optimizer",   "label": "pass",       "variant": "emphasis","fromSide": "left",   "toSide": "right", "labelDy": -20 },
+    { "id": "opt-privacy",     "from": "perf_optimizer",  "to": "privacy_guard",    "fromSide": "left",    "toSide": "right" },
+
+    { "id": "privacy-redis",   "from": "privacy_guard",   "to": "redis",            "variant": "dashed",  "fromSide": "bottom", "toSide": "top" },
+    { "id": "privacy-session", "from": "privacy_guard",   "to": "session_db",       "variant": "dashed",   "fromSide": "left",   "toSide": "top",      "via": [[650, 667], [642, 667], [642, 780]] },
+    { "id": "privacy-langfuse","from": "privacy_guard",   "to": "langfuse",         "variant": "dashed",   "fromSide": "left",   "toSide": "top",      "via": [[630, 667], [442, 667], [442, 780]] }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Parallel Fan-out (LangGraph)",
+      "items": [
+        "parallel_start fans out to cache_lookup + schema_analyzer simultaneously",
+        "dispatch_or_skip fan-in waits for BOTH branches before routing",
+        "Cache hit skips all 7 LLM agents — zero inference cost"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "9 Specialist Agents",
+      "items": [
+        "cache_lookup — Redis GET by SHA-256 semantic hash",
+        "schema_analyzer — Groq selects relevant tables from DDL",
+        "finetuned_generator — Qwen2.5-1.5B NL2SQL (fast)",
+        "syntax_validator — sqlglot + SELECT-only enforcement",
+        "executor — SQL in Docker-sandboxed container",
+        "superior_generator — OmniRoute with prior SQL + error",
+        "judge — LLM-as-judge correctness scoring",
+        "performance_optimizer — llama-3.3-70b SQL rewrite",
+        "privacy_guard — PII redaction + audit log"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Self-Correcting Retry Loop",
+      "items": [
+        "Step 1: finetuned model — fast path for common queries",
+        "Steps 2-3: superior model with prior SQL + exact error",
+        "Escalation: syntax invalid · exec error · judge rejected",
+        "Exhausted → best attempt; Docker falls back to local SQLite"
+      ]
+    }
+  ]
+}

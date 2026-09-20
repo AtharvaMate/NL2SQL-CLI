@@ -19,8 +19,8 @@ dependencies = [
     "sqlglot>=23.0.0",
     "click>=8.1.0",
     "redis>=5.0.0",
-    "rq>=1.16.0",
     "langfuse>=2.0.0",
+    "langgraph>=0.2.0",
 ]
 
 [project.scripts]

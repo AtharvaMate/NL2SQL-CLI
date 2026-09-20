@@ -20,7 +20,12 @@ from nl2sql.core.config import Config
 from nl2sql.core.engine import AgenticLoop
 from nl2sql.core.sandbox import DockerSandbox
 from nl2sql.core.session import SessionStore, SessionEntry
-from nl2sql.queue.worker import get_redis, _cache_hash, CACHE_KEY, CACHE_TTL
+from nl2sql.queue.worker import (
+    get_redis,
+    _cache_hash,
+    CACHE_KEY,
+    CACHE_TTL,
+)
 
 
 BRAND_MARK = """\
@@ -173,7 +178,7 @@ class NL2SQLApp(App):
             self._log_system("Set DB and Schema paths, then press Enter.")
 
     def _try_connect_redis(self) -> None:
-        """Connect to Redis for caching. Queries always run locally."""
+        """Connect to Redis for caching only."""
         try:
             r = get_redis(self.config.redis_url)
             r.ping()
@@ -270,28 +275,15 @@ class NL2SQLApp(App):
         self._log_system(msg)
 
     async def _run_query(self, question: str) -> None:
-        log = self.log_widget
         self._log_user(question)
         self._status("Processing…")
+        # Cache check is now handled inside the graph (parallel cache_lookup node).
+        await self._run_query_local(question)
 
-        # ── cache check ───────────────────────────────────────────────────────
-        if self._redis:
-            cache_key = CACHE_KEY.format(hash=_cache_hash(question, self.schema_text))
-            cached = self._redis.get(cache_key)
-            if cached:
-                payload = json.loads(cached)
-                self._log_system("Cache hit — returning cached result")
-                self.current_sql = payload.get("sql", "")
-                self.current_result = payload.get("result", {})
-                if self.current_result:
-                    syntax = Syntax(self.current_sql, "sql", theme="monokai", line_numbers=False, padding=1, word_wrap=True)
-                    log.write(Panel(syntax, title="[bold]SQL[/bold]", border_style="bright_cyan", expand=True, subtitle="[dim]cached[/dim]"))
-                    self._log_result_table(self.current_result)
-                self._status("✓ Cache hit")
-                self._save_session(question)
-                return
+    async def _run_query_local(self, question: str) -> None:
+        """Run the agentic loop locally (no Redis workers)."""
+        log = self.log_widget
 
-        # ── run engine ────────────────────────────────────────────────────────
         if self.sandbox and not self.sandbox.is_running and self.sandbox.is_docker_available:
             self._log_system("Starting Docker sandbox…")
             try:
@@ -301,12 +293,32 @@ class NL2SQLApp(App):
                 self._log_system(f"Docker unavailable, local mode: {e}")
 
         async for ev in self.engine.run(question, self.schema_text):
-            if ev.phase == "generating":
+            if ev.phase == "cache_hit":
+                log = self.log_widget
+                self._log_system("Cache hit — returning cached result")
+                self.current_sql = ev.sql
+                self.current_result = ev.result
+                if ev.sql:
+                    syntax = Syntax(ev.sql, "sql", theme="monokai", line_numbers=False, padding=1, word_wrap=True)
+                    log.write(Panel(syntax, title="[bold]SQL[/bold]", border_style="bright_cyan", expand=True, subtitle="[dim]cached[/dim]"))
+                if ev.result:
+                    self._log_result_table(ev.result)
+                self._status("✓ Cache hit")
+                self._save_session(question)
+                return
+
+            elif ev.phase == "schema_analyzed":
+                self._log_system(f"Schema: {ev.sql}")  # ev.sql holds "Relevant tables: ..."
+
+            elif ev.phase == "generating":
                 t = Text()
                 t.append(f"\n ◆ [{ev.step}/{ev.total}] ", style="bold bright_magenta")
-                t.append("Generating SQL…", style="bright_magenta")
+                t.append(f"Generating SQL… ({ev.model_type})", style="bright_magenta")
                 log.write(t)
                 self._status(f"Step {ev.step}/{ev.total} — generating…")
+
+            elif ev.phase == "syntax_error":
+                self._log_warn(f"Syntax/schema error: {ev.error} — escalating…")
 
             elif ev.phase == "executing":
                 syntax = Syntax(ev.sql, "sql", theme="monokai", line_numbers=False, padding=1, word_wrap=True)
@@ -324,13 +336,22 @@ class NL2SQLApp(App):
                 suggestion = (ev.judge_verdict or {}).get("suggestion", "")
                 self._log_judge(False, reason, suggestion)
 
-            elif ev.phase == "success":
+            elif ev.phase == "success" and ev.is_final:
                 reason = (ev.judge_verdict or {}).get("reason", "Correct")
                 self._log_judge(True, reason)
                 self._log_result_table(ev.result)
                 self.current_result = ev.result
                 self.current_sql = ev.sql
                 self._status("✓ Query successful")
+
+            elif ev.phase == "optimized":
+                self._log_system(f"SQL optimized by PerformanceOptimizer")
+                syntax = Syntax(ev.sql, "sql", theme="monokai", line_numbers=False, padding=1, word_wrap=True)
+                log.write(Panel(syntax, title="[bold]SQL[/bold] [dim](optimized)[/dim]", border_style="bright_green", expand=True))
+                self.current_sql = ev.sql
+
+            elif ev.phase == "privacy_redacted":
+                self._log_warn(f"PrivacyGuard: {ev.error}")
 
             elif ev.phase == "exhausted":
                 if ev.best_attempt:

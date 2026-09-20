@@ -1,0 +1,6 @@
+id,db_id,question,expected_sql,final_sql,correct,scoring,attempts,finetuned_calls,superior_calls,judge_calls,time_sec,cost_usd
+1,concert_singer,How many singers do we have?,SELECT count(*) FROM singer,SELECT count(*) FROM singer,True,exec,1,1,0,0,8.81,0.0
+2,concert_singer,What is the total number of singers?,SELECT count(*) FROM singer,SELECT count(*) FROM singer,True,exec,1,1,0,0,14.3,0.0
+3,concert_singer,"Show name, country, age for all singers ordered by age from the oldest to the youngest.","SELECT name ,  country ,  age FROM singer ORDER BY age DESC","SELECT Name ,  Country ,  Age FROM singer ORDER BY Age DESC",True,exec,1,1,0,0,22.31,0.0
+4,concert_singer,"What are the names, countries, and ages for every singer in descending order of age?","SELECT name ,  country ,  age FROM singer ORDER BY age DESC","SELECT Name ,  Country ,  Age FROM singer ORDER BY Age DESC",True,exec,1,1,0,0,21.84,0.0
+5,concert_singer,"What is the average, minimum, and maximum age of all singers from France?","SELECT avg(age) ,  min(age) ,  max(age) FROM singer WHERE country  =  'France'","SELECT avg(age) ,  min(age) ,  max(age) FROM singer WHERE country  =  'France'",True,exec,1,1,0,0,55.54,0.0

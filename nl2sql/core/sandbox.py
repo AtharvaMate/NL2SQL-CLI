@@ -60,13 +60,17 @@ class DockerSandbox:
             "import sqlite3, json, base64\n"
             "try:\n"
             f"    sql = base64.b64decode('{sql_b64}').decode()\n"
-            f"    conn = sqlite3.connect('/data/{self.db_path.name}')\n"
-            "    cur = conn.cursor()\n"
-            "    cur.execute(sql)\n"
-            "    cols = [d[0] for d in cur.description] if cur.description else []\n"
-            "    rows = [list(r) for r in cur.fetchall()] if cur.description else []\n"
-            "    conn.close()\n"
-            "    print(json.dumps({'columns': cols, 'rows': rows, 'row_count': len(rows)}))\n"
+            "    normalized_sql = sql.strip().upper()\n"
+            "    if not normalized_sql.startswith('SELECT'):\n"
+            "        print(json.dumps({'columns': [], 'rows': [], 'row_count': 0, 'error': 'Only SELECT queries are allowed'}))\n"
+            "    else:\n"
+            f"        conn = sqlite3.connect('/data/{self.db_path.name}')\n"
+            "        cur = conn.cursor()\n"
+            "        cur.execute(sql)\n"
+            "        cols = [d[0] for d in cur.description] if cur.description else []\n"
+            "        rows = [list(r) for r in cur.fetchall()] if cur.description else []\n"
+            "        conn.close()\n"
+            "        print(json.dumps({'columns': cols, 'rows': rows, 'row_count': len(rows)}))\n"
             "except Exception as e:\n"
             "    print(json.dumps({'columns': [], 'rows': [], 'row_count': 0, 'error': str(e)}))\n"
         )
@@ -109,13 +113,37 @@ class DockerSandbox:
 
     async def _execute_local(self, sql: str) -> dict:
         try:
-            conn = sqlite3.connect(str(self.db_path))
+            normalized_sql = sql.strip().upper()
+            if not normalized_sql.startswith("SELECT"):
+                return {
+                    "columns": [],
+                    "rows": [],
+                    "row_count": 0,
+                    "error": "Only SELECT queries are allowed",
+                }
+            
+            db_uri = f"file:{Path(self.db_path).resolve()}?mode=ro"
+            conn = sqlite3.connect(db_uri, uri=True)
             cur = conn.cursor()
             cur.execute(sql)
             columns = [d[0] for d in cur.description] if cur.description else []
             rows = [list(r) for r in cur.fetchall()] if cur.description else []
             conn.close()
             return {"columns": columns, "rows": rows, "row_count": len(rows)}
+        except sqlite3.OperationalError as e:
+            if "readonly" in str(e).lower():
+                return {
+                    "columns": [],
+                    "rows": [],
+                    "row_count": 0,
+                    "error": "Database is read-only",
+                }
+            return {
+                "columns": [],
+                "rows": [],
+                "row_count": 0,
+                "error": str(e),
+            }
         except sqlite3.Error as e:
             return {
                 "columns": [],
@@ -149,6 +177,7 @@ class DockerSandbox:
                 ["docker", "info"],
                 capture_output=True,
                 timeout=5,
+                check=False,
             )
             return result.returncode == 0
         except (FileNotFoundError, subprocess.TimeoutExpired):

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="generator" content="archify 2.16.0-dev.0">
-  <title>NL2SQL CLI Architecture Diagram</title>
+  <title>NL2SQL CLI — Agentic Multi-Agent Pipeline Diagram</title>
   <script>
     // Resolve the theme before first paint so light-preference users don't
     // see a dark flash. The toolbar script below re-applies with UI state.
@@ -4948,11 +4948,11 @@
            data-preset-badge-blueprint="BLUEPRINT / REV 01"
            data-preset-badge-editorial="EDITORIAL / FIELD NOTE">
         <div class="pulse-dot"></div>
-        <h1>NL2SQL CLI Architecture</h1>
+        <h1>NL2SQL CLI — Agentic Multi-Agent Pipeline</h1>
       </div>
     </div>
 
-    <script id="archify-guided-views-data" type="application/json">[]</script>
+    <script id="archify-guided-views-data" type="application/json">[{"id":"parallel-fanout","label":"Parallel fan-out","focus":["user","tui","parallel_start","cache_lookup","schema_analyzer","dispatch"],"note":"LangGraph fans out to Redis cache lookup and schema analysis simultaneously. The fan-in waits for both before routing."},{"id":"generation-loop","label":"Generation \u0026 retry loop","focus":["dispatch","finetuned_gen","syntax_validator","executor","judge","superior_gen"],"note":"Finetuned model runs first. Syntax, execution, or judge failures escalate to the superior model with full error context."},{"id":"output-path","label":"Output \u0026 observability","focus":["perf_optimizer","privacy_guard","redis","session_db","langfuse"],"note":"Successful SQL is optimized, PII-redacted, cached in Redis, persisted to sessions.db, and traced to Langfuse."}]</script>
 
     <script id="archify-i18n-data" type="application/json">{"locale":"en","messages":{"viewer.kind.frontend":"Frontend","viewer.kind.backend":"Backend","viewer.kind.database":"Database","viewer.kind.cloud":"Cloud","viewer.kind.security":"Security","viewer.kind.messagebus":"Message bus","viewer.kind.external":"External","viewer.kind.neutral":"Neutral","viewer.kind.node":"Node","viewer.kind.start":"Start","viewer.kind.active":"Active","viewer.kind.waiting":"Waiting","viewer.kind.decision":"Decision","viewer.kind.success":"Success","viewer.kind.failure":"Failure","viewer.toolbar.actions":"Diagram actions","viewer.theme.toggle.title":"Toggle theme (T)","viewer.theme.toggle":"Toggle color theme","viewer.theme.dark":"Dark","viewer.theme.light":"Light","viewer.preset.choose.title":"Choose visual style (S cycles)","viewer.preset.choose":"Choose visual style","viewer.preset.style":"Style","viewer.preset.menu":"Visual style","viewer.preset.identity":"Visual identity","viewer.preset.cycles":"S cycles","viewer.preset.classic":"Classic","viewer.preset.classic.short":"Classic","viewer.preset.classic.hint":"Stable technical default","viewer.preset.flow":"Signal Flow","viewer.preset.flow.short":"Flow","viewer.preset.flow.hint":"Motion-forward presentation","viewer.preset.blueprint":"Blueprint","viewer.preset.blueprint.hint":"Engineering review","viewer.preset.editorial":"Editorial","viewer.preset.editorial.hint":"Publication and launch notes","viewer.preset.badge.signalFlow":"SIGNAL FLOW","viewer.preset.badge.blueprint":"BLUEPRINT / REV 01","viewer.preset.badge.editorial":"EDITORIAL / FIELD NOTE","viewer.preset.badge.editorialPlate":"ARCHIFY / PLATE 04","viewer.preset.current":"Visual style: {style}. Choose visual style","viewer.motion.live":"Live","viewer.motion.still":"Still","viewer.motion.pause":"Pause motion","viewer.motion.resume":"Resume motion","viewer.motion.reduced":"Motion paused by reduced-motion preference","viewer.motion.hidden":"Motion paused while this page is hidden","viewer.motion.yielding":"Pause motion; currently yielding to {owner}","viewer.motion.yielding.title":"Live preview enabled · yielding to {owner}","viewer.owner.story":"the guided story","viewer.owner.chapter":"the active chapter","viewer.owner.chapterPreview":"the chapter delta preview","viewer.owner.handoff":"the chapter handoff","viewer.owner.route":"Route Probe","viewer.owner.lens":"Semantic Lens","viewer.owner.relationship":"Relationship Preview","viewer.owner.intent":"Intent Trace","viewer.owner.focus":"semantic focus","viewer.owner.legend":"legend preview","viewer.owner.reader":"reader interaction","viewer.present.enter":"Enter presentation stage","viewer.present.enter.title":"Presentation stage (F)","viewer.present.exit":"Exit presentation stage","viewer.present.exit.title":"Exit presentation stage (F or Escape)","viewer.present.present":"Present","viewer.present.exit.label":"Exit","viewer.export.button":"Export","viewer.export.button.title":"Export diagram (E)","viewer.export.diagram":"Export diagram","viewer.export.menu":"Export","viewer.export.subtitle":"Portable, clean outputs","viewer.export.share":"Share","viewer.export.shareCard":"Share Card","viewer.export.routeShareCard":"Route Share Card","viewer.export.reachShareCard":"Reach Share Card","viewer.export.copyShareCard":"Copy Share Card","viewer.export.copyDiagram":"Copy diagram","viewer.export.clipboardPng":"PNG to clipboard","viewer.export.raster":"Raster images","viewer.export.image":"Image","viewer.export.lossless":"Lossless image","viewer.export.compact":"Compact image","viewer.export.modern":"Modern image","viewer.export.vectorMotion":"Vector and motion","viewer.export.vectorMotion.heading":"Vector \u0026 motion","viewer.export.editable":"Editable vector","viewer.export.motion6s":"6s motion","viewer.export.unsupported":"Not supported by this browser","viewer.export.clipboardUnsupported":"Clipboard image write not supported by this browser","viewer.export.clipboardUnsupported.period":"Clipboard image write not supported by this browser.","viewer.export.clipboardUnsupported.short":"Clipboard image write not supported in this browser.","viewer.export.motionUnavailable":"Motion capture unavailable in this browser","viewer.export.webmUnavailable":"WebM unavailable in this browser","viewer.export.failed":"Export failed: {message}","viewer.export.unknownVariant":"Unknown Share Card variant: {variant}","viewer.export.routeRequired":"Trace a route before exporting a Route Share Card","viewer.export.reachRequired":"Trace authored reach before exporting a Reach Share Card","viewer.export.unknown":"unknown","viewer.export.routeFailed":"Route Share Card export failed: {message}","viewer.export.reachFailed":"Reach Share Card export failed: {message}","viewer.export.copyFailed":"Copy failed: {message}","viewer.export.copiedPng":"Copied PNG to clipboard","viewer.export.copiedShare":"Copied Share Card","viewer.export.downloadedShare":"Downloaded Share Card","viewer.export.downloadedRoute":"Downloaded Route Share Card","viewer.export.downloadedReach":"Downloaded Reach Share Card","viewer.export.downloadedWebm":"Downloaded WebM","viewer.export.recording":"Recording 6 seconds of motion…","viewer.export.card.routeSummary.one":"Route: {source} → {target} · {count} directed hop","viewer.export.card.routeSummary.other":"Route: {source} → {target} · {count} directed hops","viewer.export.card.reachSummary":"Authored {direction} from {origin} · {nodes} · {links} · max {hops}","viewer.export.card.node.one":"{count} node","viewer.export.card.node.other":"{count} nodes","viewer.export.card.link.one":"{count} link","viewer.export.card.link.other":"{count} links","viewer.export.card.hop.one":"{count} hop","viewer.export.card.hop.other":"{count} hops","viewer.export.card.routeBadge":"ARCHIFY · ROUTE · {hops}","viewer.export.card.reachBadge":"ARCHIFY · {direction} REACH","viewer.export.card.defaultBadge":"ARCHIFY · {preset} · {theme}","viewer.export.direction.upstream":"Upstream","viewer.export.direction.downstream":"Downstream","viewer.export.error.canvasUnavailable":"Canvas unavailable for {label}","viewer.export.error.contextUnavailable":"2D canvas context unavailable for {label}","viewer.export.error.toBlobUnavailable":"canvas.toBlob unavailable for {label}","viewer.export.error.toBlobNull":"canvas.toBlob returned no data for {label}","viewer.export.error.variantsCombined":"Share Card variants cannot be combined","viewer.export.error.viewerState":"Share Card export could not remove temporary viewer state","viewer.export.error.routeState":"Route Card export could not preserve the resolved route safely","viewer.export.error.reachState":"Reach Card export could not preserve authored reach safely","viewer.export.error.webmRequirements":"WebM motion export requires a trace animation and browser MediaRecorder support","viewer.export.error.mediaRecorder":"MediaRecorder failed","viewer.export.error.emptyWebm":"MediaRecorder produced an empty WebM","viewer.export.error.webmBackground":"SVG background could not be loaded for WebM export","viewer.guided.region":"Guided diagram views","viewer.guided.previous":"Previous guided view","viewer.guided.previous.title":"Previous guided view ([)","viewer.guided.next":"Next guided view","viewer.guided.next.title":"Next guided view (])","viewer.guided.views":"Guided views","viewer.guided.explore":"Explore this system","viewer.guided.intro":"Step through curated paths without changing the source diagram.","viewer.guided.trail":"Story trail","viewer.guided.beat":"Beat","viewer.guided.nextBeat":"Next","viewer.guided.play":"Play guided story","viewer.guided.play.title":"Play guided story (P)","viewer.guided.pause":"Pause guided story","viewer.guided.pause.title":"Pause guided story (P)","viewer.guided.replay":"Replay guided story","viewer.guided.replay.title":"Replay guided story (P)","viewer.guided.playStory":"Play story","viewer.guided.pauseStory":"Pause","viewer.guided.replayStory":"Replay story","viewer.guided.motionUnavailable":"Story playback unavailable while motion is Still","viewer.guided.enableMotion":"Switch motion to Live to play the guided story","viewer.guided.selectBeatLink":"Select a Story Beat to copy its exact link","viewer.guided.copyMoment":"Copy moment","viewer.guided.momentCopied":"Moment link copied","viewer.guided.momentCopyFailed":"Could not copy story moment link","viewer.guided.copied":"Copied","viewer.guided.copyFailed":"Copy failed","viewer.guided.showAll":"Show all","viewer.guided.showAll.aria":"Show entire diagram","viewer.guided.chapters":"Story chapters","viewer.guided.storyTrail":"Story trail for {label}: {count} beats","viewer.guided.chapter.open":"Open chapter {index} of {total}: {label}, {count} stops","viewer.guided.chapter.current":"Current chapter {index} of {total}: {label}, {count} stops","viewer.guided.chapter.selectedNodes":"{count} selected nodes","viewer.guided.chapter.stops":"{count} stops","viewer.guided.chapter.stop.one":"{count} stop","viewer.guided.chapter.stop.other":"{count} stops","viewer.guided.chapter.current.title":"{label} — current chapter, {count} stops","viewer.guided.chapter.delta.expanded":"{stay} stay, {enter} enter, {leave} leave","viewer.guided.chapter.delta.aria":"Open chapter {index} of {total}: {label}. Chapter focus delta: {delta}","viewer.guided.chapter.delta.title":"{label} — {delta} chapter focus","viewer.guided.handoff":"{from} → {to} · via {label}","viewer.guided.share.chapter":"Chapter {index} / {total}","viewer.guided.share.initial":"Chapter 01 / 01","viewer.guided.share.default":"Guided chapter","viewer.guided.state.ready":"Ready","viewer.guided.state.playing":"Playing","viewer.guided.state.settled":"Settled","viewer.guided.state.paused":"Paused","viewer.guided.state.pinned":"Pinned","viewer.guided.state.still":"Still","viewer.guided.share.step":"Step {index} / {total} · {label}","viewer.guided.share.staticMoment":"{step} · Static moment","viewer.guided.share.complete":"{count} steps complete · {note}","viewer.guided.share.settled":"Path settled for reading.","viewer.guided.share.staticPath":"{count} steps · Static path","viewer.guided.share.ready":"{count} steps · Ready","viewer.guided.share.aria":"{state} chapter {index} of {total}: {label}. {beat}. {route}","viewer.guided.beat.start":"Beat {index} / {total} · {label} · starting point","viewer.guided.beat.forward":"Beat {index} / {total} · {from} → {to}","viewer.guided.beat.reverse":"Beat {index} / {total} · {from} → {to} · reverse authored link","viewer.guided.beat.multiple":"Beat {index} / {total} · {from} ⇄ {to} · {count} authored links","viewer.guided.beat.group":"Beat {index} / {total} · {from} · {to} · grouped · no direct link","viewer.guided.beat.aria.prefix":"Story beat {index} of {total}: {label}. ","viewer.guided.beat.aria.start":"Starting point.","viewer.guided.beat.aria.forward":"From {from} through one authored forward relationship.","viewer.guided.beat.aria.reverse":"From {from}; the authored relationship points from {to} to {from}.","viewer.guided.beat.aria.multiple":"From {from} through {count} authored relationships; shown without arbitrary motion.","viewer.guided.beat.aria.group":"Grouped from {from} with no direct authored relationship.","viewer.guided.caption.start":"Starting point","viewer.guided.caption.grouped":"Grouped transition · no direct authored link","viewer.guided.caption.more":" +{count} more","viewer.guided.caption.reverse":"Reverse authored relationship","viewer.guided.caption.relationships":"{count} authored relationships","viewer.guided.caption.relationship":"Authored relationship","viewer.guided.caption.direction":"authored direction: {from} → {to}","viewer.guided.caption.starting":"Authored starting point","viewer.guided.beatLink":"Copy link to current story moment: Beat {index} of {total}: {label}","viewer.guided.noStory":"This diagram has no authored guided story.","viewer.guide.eyebrow":"Diagram guide","viewer.guide.close":"Close diagram guide","viewer.guide.inspecting":"Inspecting compiled semantics","viewer.guide.actions":"Diagram exploration actions","viewer.guide.find":"Find any node","viewer.guide.find.hint":"Search labels, responsibilities, kinds, and stable IDs.","viewer.guide.route":"Trace a route","viewer.guide.route.aria":"Trace a directed route","viewer.guide.route.hint":"Ask how two semantic nodes connect in authored direction.","viewer.guide.map":"See the whole system","viewer.guide.map.hint":"Open Semantic Radar with a live viewport and stable nodes.","viewer.guide.lens":"Compare semantic kinds","viewer.guide.lens.hint":"Count roles, reveal their traffic, and compare direct authored links.","viewer.guide.story":"Play the guided story","viewer.guide.story.hint":"Walk the authored chapters and real relationships.","viewer.guide.present":"Enter Presentation Stage","viewer.guide.present.hint":"Give the live diagram the viewport without changing export.","viewer.guide.shortcuts":"Additional keyboard shortcuts","viewer.guide.shortcut.export":"Export","viewer.guide.shortcut.theme":"Theme","viewer.guide.shortcut.style":"Style","viewer.guide.shortcut.reset":"Reset","viewer.guide.shortcut.zoomIn":"Zoom in","viewer.guide.shortcut.zoomOut":"Zoom out","viewer.guide.shortcut.close":"Close","viewer.guide.facts":"{nodes} · {relationships} · {views}","viewer.guide.fact.node.one":"{count} semantic node","viewer.guide.fact.node.other":"{count} semantic nodes","viewer.guide.fact.relationship.one":"{count} relationship","viewer.guide.fact.relationship.other":"{count} relationships","viewer.guide.fact.view.one":"{count} guided view","viewer.guide.fact.view.other":"{count} guided views","viewer.guide.story.available.one":"Walk {count} authored chapter and its real relationships.","viewer.guide.story.available.other":"Walk {count} authored chapters and their real relationships.","viewer.guide.story.unavailable":"No authored guided story in this diagram.","viewer.guide.open":"Open diagram guide","viewer.guide.noStory":"This diagram has no authored guided story.","viewer.finder.title":"Find a node","viewer.finder.close":"Close node finder","viewer.finder.placeholder":"Search labels or IDs","viewer.finder.search":"Search diagram nodes","viewer.finder.results":"Diagram nodes","viewer.finder.empty":"No matching nodes","viewer.finder.result.focus":"Focus {label}","viewer.finder.result.routeStart":"Choose {label} as route start","viewer.finder.result.routeTarget":"Choose {label} as route destination, {links}","viewer.finder.status.empty":"No matching nodes","viewer.finder.status.count.one":"{count} matching node","viewer.finder.status.count.other":"{count} matching nodes","viewer.finder.noun.nodes":"nodes","viewer.finder.link.one":"{count} link","viewer.finder.link.other":"{count} links","viewer.finder.result.focus.one":"Focus {label}, {count} related connection","viewer.finder.result.focus.other":"Focus {label}, {count} related connections","viewer.finder.status.filtered":"{visible} of {available} {noun}","viewer.finder.status.all":"{available} {noun}","viewer.passport.eyebrow":"Semantic passport","viewer.passport.metadata":"Node metadata","viewer.passport.evidence":"Verified source evidence","viewer.passport.verified":"Verified source","viewer.passport.reach":"Authored reach","viewer.passport.reach.trace":"Trace authored reachability","viewer.passport.upstream":"Upstream","viewer.passport.downstream":"Downstream","viewer.passport.upstream.trace":"Trace upstream authored reachability","viewer.passport.downstream.trace":"Trace downstream authored reachability","viewer.passport.close":"Close semantic passport","viewer.passport.copy":"Copy link","viewer.passport.copy.focus":"Copy link to focused node","viewer.passport.relations":"Relations","viewer.passport.relations.show":"Show connected relationships","viewer.passport.relations.hide":"Hide connected relationships","viewer.passport.relations.list":"Connected relationships","viewer.passport.copyRelation":"Copy relation","viewer.passport.copyNode":"Copy node","viewer.passport.copyPinned":"Copy link to pinned relationship","viewer.passport.copySource":"Copy link to source node","viewer.passport.copy.focused.success":"Focused node link copied","viewer.passport.copy.pinned.success":"Pinned relationship link copied","viewer.passport.copy.focused.failed":"Could not copy focused node link","viewer.passport.copy.pinned.failed":"Could not copy pinned relationship link","viewer.passport.relationship.none":"No connected relationships","viewer.passport.relationship.count.one":"{count} relation","viewer.passport.relationship.count.other":"{count} relations","viewer.passport.relationship.show.one":"Show {count} connected relationship","viewer.passport.relationship.show.other":"Show {count} connected relationships","viewer.passport.relationship.summary":"{out} outgoing · {in} incoming{loops}","viewer.passport.relationship.loops":" · {count} loop","viewer.passport.relationship.explorer":"Direct relationship explorer","viewer.passport.relationship.help":"Use arrow keys to explore relationships. Press Enter or Space to pin details; Escape clears.","viewer.passport.relationship.loopsBack":"loops back","viewer.passport.relationship.connectsTo":"connects to","viewer.passport.relationship.connectsFrom":"connects from","viewer.passport.relationship.pinned":"Pinned relationship · {from} → {to} · {label}","viewer.passport.relationship.inspect":"Inspect relationship {index} of {total}: {from} to {to}, {label}. Press Enter for details.","viewer.passport.relationship.group.out":"Outgoing","viewer.passport.relationship.group.in":"Incoming","viewer.passport.relationship.group.loop":"Self loops","viewer.passport.relationship.row":"{group}: {relationship}, {neighbor}","viewer.passport.relationship.direction.out":"OUT →","viewer.passport.relationship.direction.in":"← IN","viewer.passport.relationship.direction.loop":"LOOP","viewer.passport.sourceCount.one":"{count} verified source reference","viewer.passport.sourceCount.other":"{count} verified source references","viewer.passport.sourceMarker":"SRC","viewer.passport.beacon.one":"{count} verified source; focus this node to inspect","viewer.passport.beacon.other":"{count} verified sources; focus this node to inspect","viewer.passport.repository.open":"Open verified repository revision {revision}","viewer.passport.source.open":"Open verified source {path} at revision {revision}","viewer.passport.source.openLink":"Open ↗","viewer.passport.reach.upstream.one":"Trace {count} upstream authored node","viewer.passport.reach.upstream.other":"Trace {count} upstream authored nodes","viewer.passport.reach.downstream.one":"Trace {count} downstream authored node","viewer.passport.reach.downstream.other":"Trace {count} downstream authored nodes","viewer.passport.reach.noUpstream":"No upstream authored nodes","viewer.passport.reach.noDownstream":"No downstream authored nodes","viewer.passport.reach.status":"{direction} · {nodes} nodes · {links} links · max {hops} hops","viewer.route.eyebrow":"Route probe","viewer.route.start":"Choose a start node","viewer.route.start.find":"Find start","viewer.route.start.find.aria":"Find a route start","viewer.route.copy":"Copy link","viewer.route.copy.aria":"Copy link to traced route","viewer.route.clear":"Clear","viewer.route.clear.aria":"Clear route probe","viewer.route.traced":"Traced route","viewer.route.pickTwo":"Pick two semantic nodes on the diagram","viewer.route.pickOne":"Pick a semantic node on the diagram","viewer.route.controls":"Route journey controls","viewer.route.previous":"Previous route position","viewer.route.play":"Play route journey","viewer.route.pause":"Pause route journey","viewer.route.replay":"Replay route journey","viewer.route.next":"Next route position","viewer.route.journey":"Journey","viewer.route.pause.label":"Pause","viewer.route.replay.label":"Replay","viewer.route.overview":"Overview","viewer.route.overview.aria":"Show complete route overview","viewer.route.instructions":"Choose the source, then the destination. Direction matters.","viewer.route.destination":"Choose a destination from {label}","viewer.route.destination.find":"Find target","viewer.route.destination.find.aria":"Find a reachable route destination","viewer.route.differentDestination":"Choose a different destination","viewer.route.distinct":"A route needs two distinct semantic nodes.","viewer.route.unreachable":"No directed route to {label}","viewer.route.unreachable.detail":"{target} is not reachable from {source}. Pick a highlighted destination.","viewer.route.start.instructions":"Select the source. The next step will reveal only directed destinations.","viewer.route.copy.success":"Traced route link copied","viewer.route.copy.failed":"Could not copy traced route link","viewer.route.position":"Route position {index} of {total}: {label}","viewer.route.step":"Step {index} of {total} · {phase} · {label}","viewer.route.motionRequired":"Automatic journey requires Live motion","viewer.route.trigger.clear":"Clear traced route","viewer.route.overview.status":"{nodes} · {hops} · shortest authored route","viewer.route.overview.node.one":"{count} node","viewer.route.overview.node.other":"{count} nodes","viewer.route.overview.hop.one":"{count} directed hop","viewer.route.overview.hop.other":"{count} directed hops","viewer.route.phase.playing":"Playing","viewer.route.phase.complete":"Complete","viewer.route.phase.inspecting":"Inspecting","viewer.route.destination.count.one":"{count} directed destination available. Pick a highlighted node.","viewer.route.destination.count.other":"{count} directed destinations available. Pick a highlighted node.","viewer.route.noOutgoing":"No outgoing route starts here. Clear and choose another source.","viewer.route.result.title":"{source} to {target}","viewer.route.finder.source.title":"Choose route start","viewer.route.finder.source.placeholder":"Search route sources","viewer.route.finder.source.empty":"No matching route sources","viewer.route.finder.source.results":"Nodes that can start a route","viewer.route.finder.source.noun":"route sources","viewer.route.finder.source.badge":"start","viewer.route.finder.target.title":"Destination from {label}","viewer.route.finder.target.placeholder":"Search reachable destinations","viewer.route.finder.target.empty":"No matching reachable destinations","viewer.route.finder.target.results":"Reachable route destinations","viewer.route.finder.target.noun":"reachable destinations","viewer.route.hop.one":"{count} hop","viewer.route.hop.other":"{count} hops","viewer.lens.eyebrow":"Semantic lens","viewer.lens.title":"Compare system roles","viewer.lens.close":"Close semantic lens","viewer.lens.instruction":"Choose up to two semantic kinds. One reveals its real traffic; two compare only direct authored relationships.","viewer.lens.kinds":"Semantic kinds","viewer.lens.choose":"Choose a kind to inspect its nodes and touching relationships.","viewer.lens.copy":"Copy link to semantic lens","viewer.lens.clear":"Clear semantic lens","viewer.lens.open":"Open semantic lens","viewer.lens.openActive":"Open active semantic lens","viewer.lens.legend":"Semantic legend","viewer.lens.legend.inspect.one":"Inspect {label}, {count} node","viewer.lens.legend.inspect.other":"Inspect {label}, {count} nodes","viewer.lens.kind.count.one":"{label}, {count} node","viewer.lens.kind.count.other":"{label}, {count} nodes","viewer.lens.compare.one":"{first} → {second}: {forward} · {second} → {first}: {reverse} · {count} direct relationship","viewer.lens.compare.other":"{first} → {second}: {forward} · {second} → {first}: {reverse} · {count} direct relationships","viewer.lens.single":"{nodes} · {relationships} · connected peers remain visible","viewer.lens.node.one":"{count} {label} node","viewer.lens.node.other":"{count} {label} nodes","viewer.lens.relationship.one":"{count} touching relationship","viewer.lens.relationship.other":"{count} touching relationships","viewer.radar.title":"Semantic radar","viewer.radar.building":"Building overview","viewer.radar.openFull":"Open full semantic radar","viewer.radar.open":"Open radar","viewer.radar.close":"Close semantic radar","viewer.radar.surface":"Diagram overview. Click a node to focus it, or use arrow keys to pan.","viewer.radar.click":"Click node","viewer.radar.drag":"Drag to pan","viewer.radar.space":"Semantic radar needs more MAP space.","viewer.radar.nodes":"Semantic diagram radar nodes","viewer.radar.focus":"Focus {label} from Semantic Radar","viewer.radar.status":"{count} nodes · {viewport}","viewer.radar.fullMap":"{count} nodes · full map","viewer.radar.compacted":"Radar compacted to avoid covering the Semantic Passport or MAP controls.","viewer.radar.cancelWaiting":"Cancel semantic radar waiting for more MAP space","viewer.radar.needsSpace":"Semantic radar needs more visible MAP space","viewer.radar.viewport.full":"full map","viewer.radar.viewport.width":"{percent}% width","viewer.radar.viewport.scale":"{percent}% viewport","viewer.nav.controls":"Diagram view controls","viewer.nav.route":"Trace a directed route","viewer.nav.route.title":"Trace route (R)","viewer.nav.route.short":"PATH","viewer.nav.radar":"Open semantic radar","viewer.nav.radar.title":"Semantic radar (M)","viewer.nav.radar.short":"MAP","viewer.nav.lens":"Open semantic lens","viewer.nav.lens.title":"Semantic lens (L)","viewer.nav.lens.short":"LENS","viewer.nav.find":"Find a node","viewer.nav.find.title":"Find a node (/)","viewer.nav.guide":"Open diagram guide","viewer.nav.guide.title":"Diagram guide (?)","viewer.nav.zoomOut":"Zoom out","viewer.nav.zoomOut.title":"Zoom out (-)","viewer.nav.reset":"Reset diagram view","viewer.nav.reset.title":"Reset view (0)","viewer.nav.read":"READ","viewer.nav.zoomIn":"Zoom in","viewer.nav.zoomIn.title":"Zoom in (+)","viewer.nav.camera":"{hint}. Reset diagram view","viewer.nav.camera.title":"{semantic}{hint} · reset view (0)","viewer.nav.camera.semantic":"Semantic camera active · ","viewer.nav.level.map":"MAP","viewer.nav.level.read":"READ","viewer.nav.level.full":"FULL","viewer.nav.level.auto":"AUTO","viewer.nav.detail.map":"Zoom in to reveal relationship labels and node context","viewer.nav.detail.read":"Zoom in again to reveal tags and annotations","viewer.nav.detail.full":"Full diagram detail","viewer.intent.summary":"{label}. {out} outgoing, {in} incoming{loops}. {total} connections. Press Enter for details.","viewer.intent.loops":", {count} self loop","viewer.common.copied":"Copied","viewer.common.copyFailed":"Copy failed","viewer.common.copyLink":"Copy link","viewer.common.clear":"Clear","viewer.common.close":"Close"}}</script>
     <div class="guided-views no-print" id="guided-views" hidden aria-label="Guided diagram views">
@@ -4997,8 +4997,8 @@
     <!-- Main Diagram -->
     <div class="diagram-container" data-detail-level="read"
          data-preset-badge-editorial-plate="ARCHIFY / PLATE 04">
-      <svg viewBox="0 0 840 688" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
-        <title id="archify-diagram-title">NL2SQL CLI Architecture</title>
+      <svg viewBox="0 0 1376 960" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+        <title id="archify-diagram-title">NL2SQL CLI — Agentic Multi-Agent Pipeline</title>
         <desc id="archify-diagram-description">An architecture diagram generated by Archify.</desc>
         <!-- Definitions -->
         <defs>
@@ -5023,254 +5023,312 @@
         <rect width="100%" height="100%" fill="url(#grid)" />
 
         <!-- Boundaries (behind everything) -->
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" x="340" y="130" width="996" height="584" rx="12" class="c-region" stroke-width="1"/>
 
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="security-group" data-composition-frame-id="1" data-composition-frame-label="Observability layer  (all degrade gracefully to no-op)" x="340" y="790" width="594" height="102" rx="8" class="c-security-group" stroke-width="1"/>
 
         <!-- Connection paths (before components for correct z-order) -->
-        <path data-edge-from="user" data-edge-to="cli" data-edge-label="Natural Language" data-edge-key="0" data-composition-points="120,120;120,170" d="M 120 120 L 120 170" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="cli" data-edge-to="tui" data-edge-key="1" data-composition-points="120,230;120,290" d="M 120 230 L 120 290" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="cli" data-edge-to="config" data-edge-key="2" data-composition-points="180,200;230,200;230,90;280,90" d="M 180 200 L 222 200 Q 230 200 230 192 L 230 98 Q 230 90 238 90 L 280 90" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="tui" data-edge-to="engine" data-edge-key="3" data-composition-points="180,313;280,313" d="M 180 313 L 280 313" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="engine" data-edge-to="redis" data-edge-label="cache check" data-edge-key="4" data-composition-points="400,313;440,313;440,200;480,200" d="M 400 313 L 432 313 Q 440 313 440 305 L 440 208 Q 440 200 448 200 L 480 200" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
-        <path data-edge-from="engine" data-edge-to="llm" data-edge-key="5" data-composition-points="340,350;340,420" d="M 340 350 L 340 420" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="engine" data-edge-to="sandbox" data-edge-key="6" data-composition-points="400,327;440,327;440,450;480,450" d="M 400 327 L 432 327 Q 440 327 440 335 L 440 442 Q 440 450 448 450 L 480 450" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="engine" data-edge-to="session" data-edge-key="7" data-composition-points="280,327;230,327;230,450;180,450" d="M 280 327 L 238 327 Q 230 327 230 335 L 230 442 Q 230 450 222 450 L 180 450" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="sandbox" data-edge-to="langfuse" data-edge-label="trace" data-edge-key="8" data-composition-points="600,450;680,450" d="M 600 450 L 680 450" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
-        <path data-edge-from="llm" data-edge-to="hf" data-edge-label="step 1" data-edge-key="9" data-composition-points="347,480;347,520;400,520;400,560" d="M 347 480 L 347 512 Q 347 520 355 520 L 392 520 Q 400 520 400 528 L 400 560" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="llm" data-edge-to="omniroute" data-edge-label="step 2-3" data-edge-key="10" data-composition-points="333,480;333,520;240,520;240,560" d="M 333 480 L 333 512 Q 333 520 325 520 L 248 520 Q 240 520 240 528 L 240 560" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="sandbox" data-edge-to="docker" data-edge-key="11" data-composition-points="540,480;540,560" d="M 540 480 L 540 560" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="docker" data-edge-to="target_db" data-edge-key="12" data-composition-points="600,590;680,590" d="M 600 590 L 680 590" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="user" data-edge-to="tui" data-edge-label="question" data-edge-key="0" data-edge-id="user-tui" data-composition-points="140,337;190,337" d="M 140 337 L 190 337" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="tui" data-edge-to="parallel_start" data-edge-label="run()" data-edge-key="1" data-edge-id="tui-parallel" data-composition-points="310,337;370,337" d="M 310 337 L 370 337" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="parallel_start" data-edge-to="cache_lookup" data-edge-label="concurrent" data-edge-key="2" data-edge-id="ps-cache" data-composition-points="435,310;435,286;546,286;546,207;570,207" d="M 435 310 L 435 294 Q 435 286 443 286 L 538 286 Q 546 286 546 278 L 546 215 Q 546 207 554 207 L 570 207" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="parallel_start" data-edge-to="schema_analyzer" data-edge-label="concurrent" data-edge-key="3" data-edge-id="ps-schema" data-composition-points="435,364;435,388;546,388;546,457;570,457" d="M 435 364 L 435 380 Q 435 388 443 388 L 538 388 Q 546 388 546 396 L 546 449 Q 546 457 554 457 L 570 457" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="cache_lookup" data-edge-to="dispatch" data-edge-label="hit / miss" data-edge-key="4" data-edge-id="cache-dispatch" data-composition-points="708,207;839,207;839,310" d="M 708 207 L 831 207 Q 839 207 839 215 L 839 310" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="schema_analyzer" data-edge-to="dispatch" data-edge-key="5" data-edge-id="schema-dispatch" data-composition-points="708,457;832,457;832,364" d="M 708 457 L 824 457 Q 832 457 832 449 L 832 364" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="dispatch" data-edge-to="privacy_guard" data-edge-key="6" data-edge-id="dispatch-skip" data-composition-points="846,364;846,640" d="M 846 364 L 846 640" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="dispatch" data-edge-to="finetuned_gen" data-edge-label="cache miss" data-edge-key="7" data-edge-id="dispatch-gen" data-composition-points="908,337;939,337;939,187;970,187" d="M 908 337 L 931 337 Q 939 337 939 329 L 939 195 Q 939 187 947 187 L 970 187" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="finetuned_gen" data-edge-to="syntax_validator" data-edge-key="8" data-edge-id="ft-syntax" data-composition-points="1044,214;1044,310" d="M 1044 214 L 1044 310" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="syntax_validator" data-edge-to="executor" data-edge-key="9" data-edge-id="syntax-exec" data-composition-points="1044,364;1044,460" d="M 1044 364 L 1044 460" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="syntax_validator" data-edge-to="superior_gen" data-edge-key="10" data-edge-id="syntax-sup" data-composition-points="1118,337;1226,337;1226,274" d="M 1118 337 L 1218 337 Q 1226 337 1226 329 L 1226 274" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="executor" data-edge-to="superior_gen" data-edge-key="11" data-edge-id="exec-sup" data-composition-points="1118,487;1139,487;1139,247;1160,247" d="M 1118 487 L 1131 487 Q 1139 487 1139 479 L 1139 255 Q 1139 247 1147 247 L 1160 247" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="judge" data-edge-to="superior_gen" data-edge-label="retry" data-edge-key="12" data-edge-id="judge-sup" data-composition-points="1240,460;1240,274" d="M 1240 460 L 1240 274" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="superior_gen" data-edge-to="syntax_validator" data-edge-key="13" data-edge-id="sup-syntax" data-composition-points="1160,247;1090,247;1044,247;1044,280;1044,310" d="M 1160 247 L 1098 247 Q 1090 247 1082 247 L 1052 247 Q 1044 247 1044 255 L 1044 272 Q 1044 280 1044 288 L 1044 310" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="executor" data-edge-to="judge" data-edge-key="14" data-edge-id="exec-judge" data-composition-points="1118,487;1160,487;1160,487;1160,487" d="M 1118 487 L 1160 487 L 1160 487 L 1160 487" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="judge" data-edge-to="perf_optimizer" data-edge-label="pass" data-edge-key="15" data-edge-id="judge-opt" data-composition-points="1160,487;1139,487;1139,667;1118,667" d="M 1160 487 L 1147 487 Q 1139 487 1139 495 L 1139 659 Q 1139 667 1131 667 L 1118 667" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="perf_optimizer" data-edge-to="privacy_guard" data-edge-key="16" data-edge-id="opt-privacy" data-composition-points="970,667;904,667" d="M 970 667 L 904 667" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="privacy_guard" data-edge-to="redis" data-edge-key="17" data-edge-id="privacy-redis" data-composition-points="832,694;832,820" d="M 832 694 L 832 820" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="privacy_guard" data-edge-to="session_db" data-edge-key="18" data-edge-id="privacy-session" data-composition-points="760,667;650,667;642,667;642,780;642,820" d="M 760 667 L 654 667 Q 650 667 646 667 L 646 667 Q 642 667 642 671 L 642 772 Q 642 780 642 788 L 642 820" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="privacy_guard" data-edge-to="langfuse" data-edge-key="19" data-edge-id="privacy-langfuse" data-composition-points="760,667;630,667;442,667;442,780;442,820" d="M 760 667 L 638 667 Q 630 667 622 667 L 450 667 Q 442 667 442 675 L 442 772 Q 442 780 442 788 L 442 820" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
 
         <!-- Components -->
-        <g id="node-user" data-node-id="user" data-node-label="User" tabindex="0" role="button" aria-label="Focus User, TUI / CLI, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="TUI / CLI" data-node-context="Architecture component">
-          <title>User · TUI / CLI · Architecture component</title>
-          <rect x="60" y="60" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="60" y="60" width="120" height="60" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(66 66) scale(0.6875)">
+        <g id="node-user" data-node-id="user" data-node-label="User" tabindex="0" role="button" aria-label="Focus User, NL question, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="NL question" data-node-context="Architecture component">
+          <title>User · NL question · Architecture component</title>
+          <rect x="30" y="310" width="110" height="54" rx="6" class="c-mask"/>
+          <rect x="30" y="310" width="110" height="54" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(36 316) scale(0.6875)">
             <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="120" y="88" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">User</text>
-        <text data-detail="context" x="120" y="104" class="t-muted" font-size="9" text-anchor="middle">TUI / CLI</text>
+          <text data-node-label="" data-detail-anchor="" x="85" y="335" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">User</text>
+        <text data-detail="context" x="85" y="351" class="t-muted" font-size="9" text-anchor="middle">NL question</text>
         </g>
 
-        <g id="node-cli" data-node-id="cli" data-node-label="CLI Entry" tabindex="0" role="button" aria-label="Focus CLI Entry, cli.py, Architecture component" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="cli.py" data-node-context="Architecture component">
-          <title>CLI Entry · cli.py · Architecture component</title>
-          <rect x="60" y="170" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="60" y="170" width="120" height="60" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(66 176) scale(0.6875)">
+        <g id="node-tui" data-node-id="tui" data-node-label="TUI / CLI" tabindex="0" role="button" aria-label="Focus TUI / CLI, nl2sql  ·  query, Architecture component" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="nl2sql  ·  query" data-node-context="Architecture component">
+          <title>TUI / CLI · nl2sql  ·  query · Architecture component</title>
+          <rect x="190" y="310" width="120" height="54" rx="6" class="c-mask"/>
+          <rect x="190" y="310" width="120" height="54" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(196 316) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="120" y="198" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">CLI Entry</text>
-        <text data-detail="context" x="120" y="214" class="t-muted" font-size="9" text-anchor="middle">cli.py</text>
+          <text data-node-label="" data-detail-anchor="" x="250" y="335" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">TUI / CLI</text>
+        <text data-detail="context" x="250" y="351" class="t-muted" font-size="9" text-anchor="middle">nl2sql  ·  query</text>
         </g>
 
-        <g id="node-config" data-node-id="config" data-node-label="Config" tabindex="0" role="button" aria-label="Focus Config, core/config.py, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="core/config.py" data-node-context="Architecture component">
-          <title>Config · core/config.py · Architecture component</title>
-          <rect x="280" y="60" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="280" y="60" width="120" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(286 66) scale(0.6875)">
+        <g id="node-parallel_start" data-node-id="parallel_start" data-node-label="parallel_start" tabindex="0" role="button" aria-label="Focus parallel_start, fan-out node, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="backend" data-node-sublabel="fan-out node" data-node-tag="LangGraph entry" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>parallel_start · fan-out node · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · LangGraph entry</title>
+          <rect x="370" y="310" width="130" height="54" rx="6" class="c-mask"/>
+          <rect x="370" y="310" width="130" height="54" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(376 316) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="340" y="88" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Config</text>
-        <text data-detail="context" x="340" y="104" class="t-muted" font-size="9" text-anchor="middle">core/config.py</text>
+          <text data-node-label="" data-detail-anchor="" x="435" y="335" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">parallel_start</text>
+        <text data-detail="context" x="435" y="351" class="t-muted" font-size="9" text-anchor="middle">fan-out node</text>
+        <text data-detail="fine" x="435" y="356" class="t-backend" font-size="7" text-anchor="middle">LangGraph entry</text>
         </g>
 
-        <g id="node-tui" data-node-id="tui" data-node-label="Textual TUI" tabindex="0" role="button" aria-label="Focus Textual TUI, tui/app.py, Architecture component" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="tui/app.py" data-node-context="Architecture component">
-          <title>Textual TUI · tui/app.py · Architecture component</title>
-          <rect x="60" y="290" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="60" y="290" width="120" height="60" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(66 296) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="120" y="318" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Textual TUI</text>
-        <text data-detail="context" x="120" y="334" class="t-muted" font-size="9" text-anchor="middle">tui/app.py</text>
-        </g>
-
-        <g id="node-engine" data-node-id="engine" data-node-label="Agentic Loop" tabindex="0" role="button" aria-label="Focus Agentic Loop, core/engine.py, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="core/engine.py" data-node-context="Architecture component">
-          <title>Agentic Loop · core/engine.py · Architecture component</title>
-          <rect x="280" y="290" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="280" y="290" width="120" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(286 296) scale(0.6875)">
-            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="340" y="318" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Agentic Loop</text>
-        <text data-detail="context" x="340" y="334" class="t-muted" font-size="9" text-anchor="middle">core/engine.py</text>
-        </g>
-
-        <g id="node-redis" data-node-id="redis" data-node-label="Redis Cache" tabindex="0" role="button" aria-label="Focus Redis Cache, Optional, Architecture component" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="Optional" data-node-context="Architecture component">
-          <title>Redis Cache · Optional · Architecture component</title>
-          <rect x="480" y="170" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="480" y="170" width="120" height="60" rx="6" class="c-messagebus" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(486 176) scale(0.6875)">
-            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
-            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
-            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
-            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="540" y="198" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Redis Cache</text>
-        <text data-detail="context" x="540" y="214" class="t-muted" font-size="9" text-anchor="middle">Optional</text>
-        </g>
-
-        <g id="node-session" data-node-id="session" data-node-label="Session Store" tabindex="0" role="button" aria-label="Focus Session Store, SQLite, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="SQLite" data-node-context="Architecture component">
-          <title>Session Store · SQLite · Architecture component</title>
-          <rect x="60" y="420" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="60" y="420" width="120" height="60" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(66 426) scale(0.6875)">
+        <g id="node-cache_lookup" data-node-id="cache_lookup" data-node-label="cache_lookup" tabindex="0" role="button" aria-label="Focus cache_lookup, Agent · Redis GET, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="database" data-node-sublabel="Agent · Redis GET" data-node-tag="branch 1" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>cache_lookup · Agent · Redis GET · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · branch 1</title>
+          <rect x="570" y="180" width="138" height="54" rx="6" class="c-mask"/>
+          <rect x="570" y="180" width="138" height="54" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(576 186) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="120" y="448" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Session Store</text>
-        <text data-detail="context" x="120" y="464" class="t-muted" font-size="9" text-anchor="middle">SQLite</text>
+          <text data-node-label="" data-detail-anchor="" x="639" y="205" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">cache_lookup</text>
+        <text data-detail="context" x="639" y="221" class="t-muted" font-size="9" text-anchor="middle">Agent · Redis GET</text>
+        <text data-detail="fine" x="639" y="226" class="t-database" font-size="7" text-anchor="middle">branch 1</text>
         </g>
 
-        <g id="node-llm" data-node-id="llm" data-node-label="LLM Client" tabindex="0" role="button" aria-label="Focus LLM Client, core/llm.py, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="core/llm.py" data-node-context="Architecture component">
-          <title>LLM Client · core/llm.py · Architecture component</title>
-          <rect x="280" y="420" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="280" y="420" width="120" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(286 426) scale(0.6875)">
+        <g id="node-schema_analyzer" data-node-id="schema_analyzer" data-node-label="schema_analyzer" tabindex="0" role="button" aria-label="Focus schema_analyzer, Agent · Groq LLM, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Agent · Groq LLM" data-node-tag="branch 2" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>schema_analyzer · Agent · Groq LLM · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · branch 2</title>
+          <rect x="570" y="430" width="138" height="54" rx="6" class="c-mask"/>
+          <rect x="570" y="430" width="138" height="54" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(576 436) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="340" y="448" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">LLM Client</text>
-        <text data-detail="context" x="340" y="464" class="t-muted" font-size="9" text-anchor="middle">core/llm.py</text>
+          <text data-node-label="" data-detail-anchor="" x="639" y="455" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">schema_analyzer</text>
+        <text data-detail="context" x="639" y="471" class="t-muted" font-size="9" text-anchor="middle">Agent · Groq LLM</text>
+        <text data-detail="fine" x="639" y="476" class="t-backend" font-size="7" text-anchor="middle">branch 2</text>
         </g>
 
-        <g id="node-sandbox" data-node-id="sandbox" data-node-label="Docker Sandbox" tabindex="0" role="button" aria-label="Focus Docker Sandbox, core/sandbox.py, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="core/sandbox.py" data-node-tag="read-only" data-node-context="Architecture component">
-          <title>Docker Sandbox · core/sandbox.py · Architecture component · read-only</title>
-          <rect x="480" y="420" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="480" y="420" width="120" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(486 426) scale(0.6875)">
+        <g id="node-dispatch" data-node-id="dispatch" data-node-label="dispatch_or_skip" tabindex="0" role="button" aria-label="Focus dispatch_or_skip, fan-in gate, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="security" data-node-sublabel="fan-in gate" data-node-tag="hit → skip LLMs" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>dispatch_or_skip · fan-in gate · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · hit → skip LLMs</title>
+          <rect x="770" y="310" width="138" height="54" rx="6" class="c-mask"/>
+          <rect x="770" y="310" width="138" height="54" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(776 316) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="839" y="335" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">dispatch_or_skip</text>
+        <text data-detail="context" x="839" y="351" class="t-muted" font-size="9" text-anchor="middle">fan-in gate</text>
+        <text data-detail="fine" x="839" y="356" class="t-security" font-size="7" text-anchor="middle">hit → skip LLMs</text>
+        </g>
+
+        <g id="node-finetuned_gen" data-node-id="finetuned_gen" data-node-label="finetuned_generator" tabindex="0" role="button" aria-label="Focus finetuned_generator, Qwen2.5-1.5B · HF, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Qwen2.5-1.5B · HF" data-node-tag="Step 1" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>finetuned_generator · Qwen2.5-1.5B · HF · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · Step 1</title>
+          <rect x="970" y="160" width="148" height="54" rx="6" class="c-mask"/>
+          <rect x="970" y="160" width="148" height="54" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(976 166) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="540" y="448" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Docker Sandbox</text>
-        <text data-detail="context" x="540" y="464" class="t-muted" font-size="9" text-anchor="middle">core/sandbox.py</text>
-        <text data-detail="fine" x="540" y="472" class="t-backend" font-size="7" text-anchor="middle">read-only</text>
+          <text data-node-label="" data-detail-anchor="" x="1044" y="185" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">finetuned_generator</text>
+        <text data-detail="context" x="1044" y="201" class="t-muted" font-size="9" text-anchor="middle">Qwen2.5-1.5B · HF</text>
+        <text data-detail="fine" x="1044" y="206" class="t-backend" font-size="7" text-anchor="middle">Step 1</text>
         </g>
 
-        <g id="node-langfuse" data-node-id="langfuse" data-node-label="Langfuse" tabindex="0" role="button" aria-label="Focus Langfuse, Tracing, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="Tracing" data-node-context="Architecture component">
-          <title>Langfuse · Tracing · Architecture component</title>
-          <rect x="680" y="420" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="680" y="420" width="120" height="60" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(686 426) scale(0.6875)">
-            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
-            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+        <g id="node-syntax_validator" data-node-id="syntax_validator" data-node-label="syntax_validator" tabindex="0" role="button" aria-label="Focus syntax_validator, sqlglot · SELECT-only, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="security" data-node-sublabel="sqlglot · SELECT-only" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>syntax_validator · sqlglot · SELECT-only · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in</title>
+          <rect x="970" y="310" width="148" height="54" rx="6" class="c-mask"/>
+          <rect x="970" y="310" width="148" height="54" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(976 316) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="740" y="448" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Langfuse</text>
-        <text data-detail="context" x="740" y="464" class="t-muted" font-size="9" text-anchor="middle">Tracing</text>
+          <text data-node-label="" data-detail-anchor="" x="1044" y="335" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">syntax_validator</text>
+        <text data-detail="context" x="1044" y="351" class="t-muted" font-size="9" text-anchor="middle">sqlglot · SELECT-only</text>
         </g>
 
-        <g id="node-omniroute" data-node-id="omniroute" data-node-label="OmniRoute" tabindex="0" role="button" aria-label="Focus OmniRoute, Gen + Judge, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="Gen + Judge" data-node-context="Architecture component">
-          <title>OmniRoute · Gen + Judge · Architecture component</title>
-          <rect x="180" y="560" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="180" y="560" width="120" height="60" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(186 566) scale(0.6875)">
-            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
-            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="240" y="588" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">OmniRoute</text>
-        <text data-detail="context" x="240" y="604" class="t-muted" font-size="9" text-anchor="middle">Gen + Judge</text>
-        </g>
-
-        <g id="node-hf" data-node-id="hf" data-node-label="HuggingFace" tabindex="0" role="button" aria-label="Focus HuggingFace, Finetuned Model, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="Finetuned Model" data-node-context="Architecture component">
-          <title>HuggingFace · Finetuned Model · Architecture component</title>
-          <rect x="340" y="560" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="340" y="560" width="120" height="60" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(346 566) scale(0.6875)">
-            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
-            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="400" y="588" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">HuggingFace</text>
-        <text data-detail="context" x="400" y="604" class="t-muted" font-size="9" text-anchor="middle">Finetuned Model</text>
-        </g>
-
-        <g id="node-docker" data-node-id="docker" data-node-label="Docker" tabindex="0" role="button" aria-label="Focus Docker, Isolated Container, Architecture component" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="Isolated Container" data-node-tag="sandboxed" data-node-context="Architecture component">
-          <title>Docker · Isolated Container · Architecture component · sandboxed</title>
-          <rect x="480" y="560" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="480" y="560" width="120" height="60" rx="6" class="c-cloud" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(486 566) scale(0.6875)">
+        <g id="node-executor" data-node-id="executor" data-node-label="executor" tabindex="0" role="button" aria-label="Focus executor, DockerSandbox, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="DockerSandbox" data-node-tag="read-only" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>executor · DockerSandbox · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · read-only</title>
+          <rect x="970" y="460" width="148" height="54" rx="6" class="c-mask"/>
+          <rect x="970" y="460" width="148" height="54" rx="6" class="c-cloud" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(976 466) scale(0.6875)">
             <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="540" y="588" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Docker</text>
-        <text data-detail="context" x="540" y="604" class="t-muted" font-size="9" text-anchor="middle">Isolated Container</text>
-        <text data-detail="fine" x="540" y="612" class="t-cloud" font-size="7" text-anchor="middle">sandboxed</text>
+          <text data-node-label="" data-detail-anchor="" x="1044" y="485" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">executor</text>
+        <text data-detail="context" x="1044" y="501" class="t-muted" font-size="9" text-anchor="middle">DockerSandbox</text>
+        <text data-detail="fine" x="1044" y="506" class="t-cloud" font-size="7" text-anchor="middle">read-only</text>
         </g>
 
-        <g id="node-target_db" data-node-id="target_db" data-node-label="Target DB" tabindex="0" role="button" aria-label="Focus Target DB, SQLite, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="SQLite" data-node-context="Architecture component">
-          <title>Target DB · SQLite · Architecture component</title>
-          <rect x="680" y="560" width="120" height="60" rx="6" class="c-mask"/>
-          <rect x="680" y="560" width="120" height="60" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(686 566) scale(0.6875)">
+        <g id="node-superior_gen" data-node-id="superior_gen" data-node-label="superior_generator" tabindex="0" role="button" aria-label="Focus superior_generator, OmniRoute · error ctx, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="backend" data-node-sublabel="OmniRoute · error ctx" data-node-tag="Steps 2-3" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>superior_generator · OmniRoute · error ctx · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · Steps 2-3</title>
+          <rect x="1160" y="220" width="146" height="54" rx="6" class="c-mask"/>
+          <rect x="1160" y="220" width="146" height="54" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1166 226) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="1233" y="245" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">superior_generator</text>
+        <text data-detail="context" x="1233" y="261" class="t-muted" font-size="9" text-anchor="middle">OmniRoute · error ctx</text>
+        <text data-detail="fine" x="1233" y="266" class="t-backend" font-size="7" text-anchor="middle">Steps 2-3</text>
+        </g>
+
+        <g id="node-judge" data-node-id="judge" data-node-label="judge" tabindex="0" role="button" aria-label="Focus judge, Groq qwen3.8-27b, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="security" data-node-sublabel="Groq qwen3.8-27b" data-node-tag="LLM-as-judge" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>judge · Groq qwen3.8-27b · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · LLM-as-judge</title>
+          <rect x="1160" y="460" width="146" height="54" rx="6" class="c-mask"/>
+          <rect x="1160" y="460" width="146" height="54" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(1166 466) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="1233" y="485" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">judge</text>
+        <text data-detail="context" x="1233" y="501" class="t-muted" font-size="9" text-anchor="middle">Groq qwen3.8-27b</text>
+        <text data-detail="fine" x="1233" y="506" class="t-security" font-size="7" text-anchor="middle">LLM-as-judge</text>
+        </g>
+
+        <g id="node-perf_optimizer" data-node-id="perf_optimizer" data-node-label="perf_optimizer" tabindex="0" role="button" aria-label="Focus perf_optimizer, llama-3.3-70b rewrite, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="backend" data-node-sublabel="llama-3.3-70b rewrite" data-node-tag="complex SQL" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>perf_optimizer · llama-3.3-70b rewrite · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in · complex SQL</title>
+          <rect x="970" y="640" width="148" height="54" rx="6" class="c-mask"/>
+          <rect x="970" y="640" width="148" height="54" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(976 646) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="1044" y="665" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">perf_optimizer</text>
+        <text data-detail="context" x="1044" y="681" class="t-muted" font-size="9" text-anchor="middle">llama-3.3-70b rewrite</text>
+        <text data-detail="fine" x="1044" y="686" class="t-backend" font-size="7" text-anchor="middle">complex SQL</text>
+        </g>
+
+        <g id="node-privacy_guard" data-node-id="privacy_guard" data-node-label="privacy_guard" tabindex="0" role="button" aria-label="Focus privacy_guard, PII redact · audit log, LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in" aria-pressed="false" data-node-kind="security" data-node-sublabel="PII redact · audit log" data-node-context="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <title>privacy_guard · PII redact · audit log · LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in</title>
+          <rect x="760" y="640" width="144" height="54" rx="6" class="c-mask"/>
+          <rect x="760" y="640" width="144" height="54" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(766 646) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="832" y="665" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">privacy_guard</text>
+        <text data-detail="context" x="832" y="681" class="t-muted" font-size="9" text-anchor="middle">PII redact · audit log</text>
+        </g>
+
+        <g id="node-redis" data-node-id="redis" data-node-label="Redis" tabindex="0" role="button" aria-label="Focus Redis, Cache · 1-hr TTL, Observability layer  (all degrade gracefully to no-op)" aria-pressed="false" data-node-kind="database" data-node-sublabel="Cache · 1-hr TTL" data-node-context="Observability layer  (all degrade gracefully to no-op)">
+          <title>Redis · Cache · 1-hr TTL · Observability layer  (all degrade gracefully to no-op)</title>
+          <rect x="760" y="820" width="144" height="52" rx="6" class="c-mask"/>
+          <rect x="760" y="820" width="144" height="52" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(766 826) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="740" y="588" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Target DB</text>
-        <text data-detail="context" x="740" y="604" class="t-muted" font-size="9" text-anchor="middle">SQLite</text>
+          <text data-node-label="" data-detail-anchor="" x="832" y="844" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Redis</text>
+        <text data-detail="context" x="832" y="860" class="t-muted" font-size="9" text-anchor="middle">Cache · 1-hr TTL</text>
+        </g>
+
+        <g id="node-session_db" data-node-id="session_db" data-node-label="sessions.db" tabindex="0" role="button" aria-label="Focus sessions.db, SQLite history, Observability layer  (all degrade gracefully to no-op)" aria-pressed="false" data-node-kind="database" data-node-sublabel="SQLite history" data-node-context="Observability layer  (all degrade gracefully to no-op)">
+          <title>sessions.db · SQLite history · Observability layer  (all degrade gracefully to no-op)</title>
+          <rect x="570" y="820" width="144" height="52" rx="6" class="c-mask"/>
+          <rect x="570" y="820" width="144" height="52" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(576 826) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="642" y="844" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">sessions.db</text>
+        <text data-detail="context" x="642" y="860" class="t-muted" font-size="9" text-anchor="middle">SQLite history</text>
+        </g>
+
+        <g id="node-langfuse" data-node-id="langfuse" data-node-label="Langfuse" tabindex="0" role="button" aria-label="Focus Langfuse, LLM tracing · optional, Observability layer  (all degrade gracefully to no-op)" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="LLM tracing · optional" data-node-context="Observability layer  (all degrade gracefully to no-op)">
+          <title>Langfuse · LLM tracing · optional · Observability layer  (all degrade gracefully to no-op)</title>
+          <rect x="370" y="820" width="144" height="52" rx="6" class="c-mask"/>
+          <rect x="370" y="820" width="144" height="52" rx="6" class="c-cloud" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(376 826) scale(0.6875)">
+            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="442" y="844" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Langfuse</text>
+        <text data-detail="context" x="442" y="860" class="t-muted" font-size="9" text-anchor="middle">LLM tracing · optional</text>
         </g>
 
         <!-- Connection labels -->
-        <g data-detail="context" data-edge-from="user" data-edge-to="cli" data-edge-label="Natural Language" data-edge-key="0">
-          <rect x="76.6" y="124" width="86.8" height="14" rx="3" class="c-mask"/>
-          <text x="120" y="134" class="t-muted" font-size="8" text-anchor="middle">Natural Language</text>
+        <g data-detail="context" data-edge-from="user" data-edge-to="tui" data-edge-label="question" data-edge-key="0" data-edge-id="user-tui">
+          <rect x="140.8" y="317" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="165" y="327" class="t-backend" font-size="8" text-anchor="middle">question</text>
+        </g>
+        <g data-detail="context" data-edge-from="tui" data-edge-to="parallel_start" data-edge-label="run()" data-edge-key="1" data-edge-id="tui-parallel">
+          <rect x="323" y="317" width="34" height="14" rx="3" class="c-mask"/>
+          <text x="340" y="327" class="t-backend" font-size="8" text-anchor="middle">run()</text>
+        </g>
+        <g data-detail="context" data-edge-from="parallel_start" data-edge-to="cache_lookup" data-edge-label="concurrent" data-edge-key="2" data-edge-id="ps-cache">
+          <rect x="461.5" y="248" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="490.5" y="258" class="t-backend" font-size="8" text-anchor="middle">concurrent</text>
+        </g>
+        <g data-detail="context" data-edge-from="parallel_start" data-edge-to="schema_analyzer" data-edge-label="concurrent" data-edge-key="3" data-edge-id="ps-schema">
+          <rect x="461.5" y="386" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="490.5" y="396" class="t-backend" font-size="8" text-anchor="middle">concurrent</text>
+        </g>
+        <g data-detail="context" data-edge-from="cache_lookup" data-edge-to="dispatch" data-edge-label="hit / miss" data-edge-key="4" data-edge-id="cache-dispatch">
+          <rect x="810" y="238.5" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="839" y="248.5" class="t-muted" font-size="8" text-anchor="middle">hit / miss</text>
+        </g>
+
+
+        <g data-detail="context" data-edge-from="dispatch" data-edge-to="finetuned_gen" data-edge-label="cache miss" data-edge-key="7" data-edge-id="dispatch-gen">
+          <rect x="910" y="242" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="939" y="252" class="t-backend" font-size="8" text-anchor="middle">cache miss</text>
         </g>
 
 
 
-        <g data-detail="context" data-edge-from="engine" data-edge-to="redis" data-edge-label="cache check" data-edge-key="4">
-          <rect x="408.6" y="236.5" width="62.8" height="14" rx="3" class="c-mask"/>
-          <text x="440" y="246.5" class="t-messagebus" font-size="8" text-anchor="middle">cache check</text>
+
+        <g data-detail="context" data-edge-from="judge" data-edge-to="superior_gen" data-edge-label="retry" data-edge-key="12" data-edge-id="judge-sup">
+          <rect x="1247" y="440" width="34" height="14" rx="3" class="c-mask"/>
+          <text x="1264" y="450" class="t-security" font-size="8" text-anchor="middle">retry</text>
         </g>
 
 
+        <g data-detail="context" data-edge-from="judge" data-edge-to="perf_optimizer" data-edge-label="pass" data-edge-key="15" data-edge-id="judge-opt">
+          <rect x="1124" y="537" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="1139" y="547" class="t-backend" font-size="8" text-anchor="middle">pass</text>
+        </g>
 
-        <g data-detail="context" data-edge-from="sandbox" data-edge-to="langfuse" data-edge-label="trace" data-edge-key="8">
-          <rect x="623" y="430" width="34" height="14" rx="3" class="c-mask"/>
-          <text x="640" y="440" class="t-messagebus" font-size="8" text-anchor="middle">trace</text>
-        </g>
-        <g data-detail="context" data-edge-from="llm" data-edge-to="hf" data-edge-label="step 1" data-edge-key="9">
-          <rect x="378.1" y="500" width="38.8" height="14" rx="3" class="c-mask"/>
-          <text x="397.5" y="510" class="t-muted" font-size="8" text-anchor="middle">step 1</text>
-        </g>
-        <g data-detail="context" data-edge-from="llm" data-edge-to="omniroute" data-edge-label="step 2-3" data-edge-key="10">
-          <rect x="238.3" y="500" width="48.4" height="14" rx="3" class="c-mask"/>
-          <text x="262.5" y="510" class="t-muted" font-size="8" text-anchor="middle">step 2-3</text>
-        </g>
+
 
 
 
         <!-- Boundary labels (foreground masks keep routes out of titles) -->
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="0" data-composition-frame-kind="region" data-composition-frame-label="LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in">
+          <rect data-graph-role="structural-frame-label-mask" x="344" y="140" width="388" height="16" rx="3" class="c-mask"/>
+          <text data-boundary-label="" x="348" y="153" class="t-cloud" font-size="9" font-weight="600">LangGraph StateGraph — 9 specialist agents · parallel fan-out + fan-in</text>
+        </g>
 
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="security-group" data-composition-frame-label="Observability layer  (all degrade gracefully to no-op)">
+          <rect data-graph-role="structural-frame-label-mask" x="344" y="800" width="301.59999999999997" height="16" rx="3" class="c-mask"/>
+          <text data-boundary-label="" x="348" y="813" class="t-security" font-size="9" font-weight="600">Observability layer  (all degrade gracefully to no-op)</text>
+        </g>
 
         <!-- Legend -->
         <g data-legend="" data-legend-bridge="">
-          <text x="40" y="652" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="Frontend" data-legend-x="40" data-legend-baseline="672" data-legend-width="83">
-            <rect x="40" y="663" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
-            <text x="62" y="672" class="t-muted" font-size="10" font-weight="500">Frontend</text>
+          <text x="40" y="924" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="Frontend" data-legend-x="40" data-legend-baseline="944" data-legend-width="83">
+            <rect x="40" y="935" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
+            <text x="62" y="944" class="t-muted" font-size="10" font-weight="500">Frontend</text>
           </g>
-          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Backend" data-legend-x="145" data-legend-baseline="672" data-legend-width="78">
-            <rect x="145" y="663" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
-            <text x="167" y="672" class="t-muted" font-size="10" font-weight="500">Backend</text>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Backend" data-legend-x="145" data-legend-baseline="944" data-legend-width="78">
+            <rect x="145" y="935" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
+            <text x="167" y="944" class="t-muted" font-size="10" font-weight="500">Backend</text>
           </g>
-          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Database" data-legend-x="245" data-legend-baseline="672" data-legend-width="83">
-            <rect x="245" y="663" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
-            <text x="267" y="672" class="t-muted" font-size="10" font-weight="500">Database</text>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Database" data-legend-x="245" data-legend-baseline="944" data-legend-width="83">
+            <rect x="245" y="935" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
+            <text x="267" y="944" class="t-muted" font-size="10" font-weight="500">Database</text>
           </g>
-          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="Cloud" data-legend-x="350" data-legend-baseline="672" data-legend-width="68">
-            <rect x="350" y="663" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
-            <text x="372" y="672" class="t-muted" font-size="10" font-weight="500">Cloud</text>
+          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="Cloud" data-legend-x="350" data-legend-baseline="944" data-legend-width="68">
+            <rect x="350" y="935" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
+            <text x="372" y="944" class="t-muted" font-size="10" font-weight="500">Cloud</text>
           </g>
-          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="Message bus" data-legend-x="440" data-legend-baseline="672" data-legend-width="98">
-            <rect x="440" y="663" width="16" height="10" rx="2.5" class="c-messagebus" stroke-width="1"/>
-            <text x="462" y="672" class="t-muted" font-size="10" font-weight="500">Message bus</text>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Security" data-legend-x="440" data-legend-baseline="944" data-legend-width="83">
+            <rect x="440" y="935" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
+            <text x="462" y="944" class="t-muted" font-size="10" font-weight="500">Security</text>
           </g>
-          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External" data-legend-x="560" data-legend-baseline="672" data-legend-width="83">
-            <rect x="560" y="663" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
-            <text x="582" y="672" class="t-muted" font-size="10" font-weight="500">External</text>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External" data-legend-x="545" data-legend-baseline="944" data-legend-width="83">
+            <rect x="545" y="935" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="567" y="944" class="t-muted" font-size="10" font-weight="500">External</text>
           </g>
         </g>
       </svg>
@@ -5462,36 +5520,43 @@
       <div class="card">
         <div class="card-header">
           <div class="card-dot cyan"></div>
-          <h3>Progressive Escalation</h3>
+          <h3>Parallel Fan-out (LangGraph)</h3>
         </div>
         <ul>
-          <li>&bull; Finetuned model for step 1 — cheap and fast</li>
-          <li>&bull; Superior OmniRoute model for steps 2–3 on failure</li>
-          <li>&bull; Error feedback loop for self-correction</li>
+          <li>&bull; parallel_start fans out to cache_lookup + schema_analyzer simultaneously</li>
+          <li>&bull; dispatch_or_skip fan-in waits for BOTH branches before routing</li>
+          <li>&bull; Cache hit skips all 7 LLM agents — zero inference cost</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-dot emerald"></div>
-          <h3>Safety</h3>
+          <h3>9 Specialist Agents</h3>
         </div>
         <ul>
-          <li>&bull; Docker sandboxed execution</li>
-          <li>&bull; Read-only database copy inside container</li>
-          <li>&bull; Isolated container lifecycle per query</li>
+          <li>&bull; cache_lookup — Redis GET by SHA-256 semantic hash</li>
+          <li>&bull; schema_analyzer — Groq selects relevant tables from DDL</li>
+          <li>&bull; finetuned_generator — Qwen2.5-1.5B NL2SQL (fast)</li>
+          <li>&bull; syntax_validator — sqlglot + SELECT-only enforcement</li>
+          <li>&bull; executor — SQL in Docker-sandboxed container</li>
+          <li>&bull; superior_generator — OmniRoute with prior SQL + error</li>
+          <li>&bull; judge — LLM-as-judge correctness scoring</li>
+          <li>&bull; performance_optimizer — llama-3.3-70b SQL rewrite</li>
+          <li>&bull; privacy_guard — PII redaction + audit log</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-dot amber"></div>
-          <h3>Optional Features</h3>
+          <div class="card-dot rose"></div>
+          <h3>Self-Correcting Retry Loop</h3>
         </div>
         <ul>
-          <li>&bull; Redis semantic caching (1-hour TTL)</li>
-          <li>&bull; Langfuse observability tracing</li>
-          <li>&bull; Session history persisted to SQLite</li>
+          <li>&bull; Step 1: finetuned model — fast path for common queries</li>
+          <li>&bull; Steps 2-3: superior model with prior SQL + exact error</li>
+          <li>&bull; Escalation: syntax invalid · exec error · judge rejected</li>
+          <li>&bull; Exhausted → best attempt; Docker falls back to local SQLite</li>
         </ul>
       </div>
     </div>

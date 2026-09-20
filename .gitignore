@@ -9,3 +9,8 @@ build/
 .venv/
 db/
 grilling-handoff.md
+
+CHANGES.md
+STUDY_GUIDE.md
+spider_databases/
+graphify-out/
