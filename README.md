@@ -8,6 +8,7 @@
 [![LangGraph](https://img.shields.io/badge/LangGraph-1.2%2B-6366f1?logo=python&logoColor=white)](https://github.com/langchain-ai/langgraph)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](LICENSE)
 [![Built with Textual](https://img.shields.io/badge/TUI-Textual-6366f1)](https://textual.textualize.io)
+[![Finetuned Model](https://img.shields.io/badge/🤗_Model-qwen2.5--1.5b--nl2sql-blue)](https://huggingface.co/AtharvaMate/qwen2.5-1.5b-nl2sql)
 
 </div>
 
@@ -97,7 +98,7 @@ parallel_start
 
 ### 5 — LLM-as-Judge
 
-`judge` calls Groq (`qwen/qwen3.8-27b`, or OmniRoute as fallback) with the question, the generated SQL, and the result set. Returns a structured verdict: `correct: true/false` + `reason` + `suggestion`.
+`judge` calls Groq (`qwen/qwen3.8-27b`, or a frontier model as fallback) with the question, the generated SQL, and the result set. Returns a structured verdict: `correct: true/false` + `reason` + `suggestion`.
 
 - **Correct** → performance_optimizer
 - **Wrong + retries left** → superior_generator
@@ -105,7 +106,7 @@ parallel_start
 
 ### 6 — Superior Generator (Steps 2–3)
 
-`superior_generator` calls **OmniRoute** with the prior failed SQL and the **exact execution or judge error** as context. This is strictly more information than a fresh prompt — the model can self-correct rather than guessing again.
+`superior_generator` calls a **capable frontier model** with the prior failed SQL and the **exact execution or judge error** as context. This is strictly more information than a fresh prompt — the model can self-correct rather than guessing again.
 
 ### 7 — Performance Optimizer
 
@@ -126,7 +127,7 @@ parallel_start
 | `finetuned_generator` | `agents/sql_generator.py` | Qwen2.5-1.5B (HF) | Step 1 SQL generation — fast, cheap, NL2SQL finetuned |
 | `syntax_validator` | `agents/syntax_validator.py` | sqlglot | SQL parse + SELECT-only enforcement + schema column check |
 | `executor` | `agents/executor.py` | DockerSandbox | Runs SQL in isolated container against read-only DB copy |
-| `superior_generator` | `agents/sql_generator.py` | OmniRoute auto/coding | Steps 2–3 retry with prior SQL + exact error context |
+| `superior_generator` | `agents/sql_generator.py` | Frontier LLM | Steps 2–3 retry with prior SQL + exact error context |
 | `judge` | `agents/judge.py` | Groq `qwen/qwen3.8-27b` | LLM-as-judge correctness scoring with reason + suggestion |
 | `performance_optimizer` | `agents/performance_optimizer.py` | Groq `llama-3.3-70b-versatile` | Conditional SQL rewrite for complex queries |
 | `privacy_guard` | `agents/privacy_guard.py` | Regex | PII column redaction + audit log write |
@@ -169,7 +170,7 @@ Question + Schema
         ├─ wrong + exhausted ──► performance_optimizer    │
         └─ correct ──────────────────────────────────────  │
                                                          │
-  superior_generator (OmniRoute · error context) ────────┘
+  superior_generator (frontier LLM · error context) ─────┘
         └──► syntax_validator  (retry loop)
                                                          
         ▼  (all paths converge)
@@ -185,13 +186,39 @@ Question + Schema
        END
 ```
 
-**Why two models?** The finetuned HuggingFace model is fast and cheap — ideal for queries in its training distribution (~60–70% of real business queries). The OmniRoute superior model handles novel or complex queries, and receives the previous SQL and exact error as context so it can self-correct rather than starting from scratch.
+**Why two models?** The finetuned HuggingFace model is fast and cheap — ideal for queries in its training distribution (~60–70% of real business queries). The superior frontier model handles novel or complex queries, and receives the previous SQL and exact error as context so it can self-correct rather than starting from scratch.
 
 **Why parallel start?** Schema analysis (a Groq LLM call) and Redis cache lookup are completely independent. Running them concurrently means the fan-in completes as soon as both finish — in practice they both complete in ~10ms if Redis is local, with no serialization penalty.
 
 **Why Docker?** SQL execution happens inside an isolated container against a read-only copy of the database. A malformed or destructive query cannot touch the real file. The container receives the SQL string directly, not a shell command.
 
 **Why semantic caching?** Redis caches by `SHA-256(normalize(question) + schema identifiers)`. A repeated or paraphrased question that produces the same hash returns instantly without touching any LLM.
+
+---
+
+## Finetuned Model
+
+The `finetuned_generator` agent calls **[AtharvaMate/qwen2.5-1.5b-nl2sql](https://huggingface.co/AtharvaMate/qwen2.5-1.5b-nl2sql)** — a Qwen2.5-1.5B-Instruct model finetuned specifically for NL2SQL. The full training pipeline lives in a separate repo:
+
+**[github.com/AtharvaMate/NL2SQL](https://github.com/AtharvaMate/NL2SQL)**
+
+### How it was trained
+
+| | |
+|---|---|
+| **Base model** | Qwen2.5-1.5B-Instruct |
+| **Method** | QLoRA — 4-bit NF4 quantization + LoRA adapters (r=16) on all linear layers |
+| **Dataset** | [`b-mc2/sql-create-context`](https://huggingface.co/datasets/b-mc2/sql-create-context), filtered through sqlglot — every training example has syntactically valid SQL |
+| **Input format** | Qwen chat template: `system` = schema DDL, `user` = NL question, `assistant` = raw SQL |
+| **Evaluation** | Execution accuracy — predicted SQL and gold SQL are both run against an in-memory SQLite DB; result sets are compared |
+
+### Why QLoRA
+
+Training a 1.5B model full-precision is out of reach without multi-GPU setup. QLoRA makes it feasible on a single consumer GPU by compressing base model weights to 4-bit NF4, training only ~0.5% of parameters (the LoRA adapters), and using gradient checkpointing + paged AdamW to keep memory flat. After training the adapters are merged back into the base model and the result is pushed to HF Hub as a standard FP16 checkpoint.
+
+### Why this model as Step 1
+
+It was finetuned specifically on NL2SQL — the task distribution matches exactly. For queries in the training distribution it outperforms much larger general-purpose models at a fraction of the inference cost. The superior model only runs on the subset that fails validation or judge scoring.
 
 ---
 
@@ -237,9 +264,8 @@ HF_ENDPOINT=https://your-endpoint.huggingface.cloud
 HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # ── Superior model (Steps 2-3) ────────────────────────
-OMNIROUTE_URL=https://your-omniroute-host
-OMNIROUTE_GEN_MODEL=auto/coding:free
-OMNIROUTE_JUDGE_MODEL=no-think/antigravity/claude-sonnet-4-6
+SUPERIOR_LLM_URL=https://your-llm-host/v1/chat/completions
+SUPERIOR_LLM_MODEL=your-model-id
 
 # ── Schema analyzer + judge (Groq) ────────────────────
 GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
@@ -356,5 +382,5 @@ Every external dependency degrades cleanly — the core agentic loop has no hard
 |---|---|---|
 | Docker | SQL runs in isolated container | Falls back to local read-only SQLite |
 | Redis | Results cached with 1hr TTL | Cache skipped; every query hits LLMs |
-| Groq API | `schema_analyzer` + `judge` + `performance_optimizer` use Groq | Falls back to OmniRoute for all LLM calls |
+| Groq API | `schema_analyzer` + `judge` + `performance_optimizer` use Groq | Falls back to superior LLM for all judge calls |
 | Langfuse | Full LLM span tracing | No-op; no impact on results |
