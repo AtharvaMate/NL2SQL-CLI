@@ -39,7 +39,14 @@ async def run(state: GraphState, config: Config) -> dict:
             result=result,
         )
     except Exception as e:
-        verdict = {"correct": True, "reason": f"Judge unavailable: {e}", "suggestion": ""}
+        # Fail closed: an unavailable judge must not silently approve wrong SQL.
+        # The retry loop will treat this as a rejection and escalate to the
+        # superior model or surface the best attempt seen so far.
+        verdict = {
+            "correct": False,
+            "reason": f"Judge unavailable: {e}",
+            "suggestion": "Check LLM connectivity and retry.",
+        }
 
     error_feedback = None
     if not verdict.get("correct", False):

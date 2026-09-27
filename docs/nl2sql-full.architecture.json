@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "NL2SQL CLI — 9-Agent LangGraph Pipeline",
+    "quality_profile": "showcase",
+    "locale": "en"
+  },
+  "components": [
+    { "id": "user",       "type": "external",   "label": "User",              "sublabel": "Natural Language",      "pos": [80,  80] },
+    { "id": "cli",        "type": "frontend",   "label": "CLI / TUI",         "sublabel": "cli.py · tui/app.py",   "pos": [280, 80] },
+    { "id": "config",     "type": "backend",    "label": "Config",            "sublabel": "core/config.py",        "pos": [500, 80] },
+    { "id": "engine",     "type": "backend",    "label": "AgenticLoop",       "sublabel": "core/engine.py",        "pos": [280, 220] },
+    { "id": "graph",      "type": "backend",    "label": "LangGraph Graph",   "sublabel": "core/graph.py",         "pos": [500, 220] },
+
+    { "id": "par_start",  "type": "backend",    "label": "parallel_start",    "sublabel": "fan-out trigger",       "pos": [500, 370] },
+
+    { "id": "cache_node", "type": "messagebus", "label": "cache_lookup",      "sublabel": "Redis SHA-256 hash",    "pos": [280, 490] },
+    { "id": "schema_node","type": "backend",    "label": "schema_analyzer",   "sublabel": "Groq qwen3.8-27b",      "pos": [720, 490] },
+
+    { "id": "dispatch",   "type": "backend",    "label": "dispatch_or_skip",  "sublabel": "fan-in · route",        "pos": [500, 490] },
+
+    { "id": "ft_gen",     "type": "backend",    "label": "finetuned_generator","sublabel": "HuggingFace Qwen2.5", "pos": [280, 640] },
+    { "id": "syn_val",    "type": "backend",    "label": "syntax_validator",   "sublabel": "sqlglot · SELECT-only","pos": [280, 790] },
+    { "id": "executor",   "type": "backend",    "label": "executor",           "sublabel": "DockerSandbox",         "pos": [500, 790] },
+    { "id": "judge",      "type": "backend",    "label": "judge",              "sublabel": "Groq qwen3.8-27b",      "pos": [720, 790] },
+    { "id": "sup_gen",    "type": "backend",    "label": "superior_generator", "sublabel": "OmniRoute · error ctx","pos": [500, 640] },
+    { "id": "perf_opt",   "type": "backend",    "label": "perf_optimizer",     "sublabel": "Groq llama-3.3-70b",   "pos": [500, 940] },
+    { "id": "priv_guard", "type": "security",   "label": "privacy_guard",      "sublabel": "PII redact · audit",   "pos": [280, 940] },
+
+    { "id": "redis",      "type": "database",   "label": "Redis",              "sublabel": "Cache · 1hr TTL",      "pos": [80,  490] },
+    { "id": "hf",         "type": "external",   "label": "HuggingFace",        "sublabel": "Finetuned Endpoint",   "pos": [80,  640] },
+    { "id": "docker",     "type": "cloud",      "label": "Docker Container",   "sublabel": "python:3.12-slim",     "pos": [720, 640], "tag": "sandboxed" },
+    { "id": "groq",       "type": "external",   "label": "Groq API",           "sublabel": "qwen + llama",         "pos": [940, 640] },
+    { "id": "omniroute",  "type": "external",   "label": "OmniRoute",          "sublabel": "auto/coding:free",     "pos": [720, 940] },
+    { "id": "session_db", "type": "database",   "label": "Session Store",      "sublabel": ".nl2sql/sessions.db",  "pos": [80,  940] },
+    { "id": "langfuse",   "type": "external",   "label": "Langfuse",           "sublabel": "tracing (optional)",   "pos": [940, 940] }
+  ],
+  "connections": [
+    { "from": "user",       "to": "cli",       "label": "question",   "labelDy": -18 },
+    { "from": "cli",        "to": "config",    "label": "load .env",  "variant": "dashed", "labelDy": -18 },
+    { "from": "cli",        "to": "engine",    "label": "run()" },
+    { "from": "engine",     "to": "graph",     "label": "run_graph()" },
+    { "from": "graph",      "to": "par_start", "label": "entry" },
+
+    { "from": "par_start",  "to": "cache_node","label": "branch 1", "fromSide": "left",   "toSide": "right",  "variant": "dashed" },
+    { "from": "par_start",  "to": "schema_node","label": "branch 2", "fromSide": "right",  "toSide": "left",  "variant": "dashed" },
+
+    { "from": "cache_node", "to": "redis",     "label": "GET",        "variant": "dashed" },
+    { "from": "cache_node", "to": "dispatch",  "label": "hit/miss",   "fromSide": "right",  "toSide": "left" },
+    { "from": "schema_node","to": "dispatch",  "label": "filtered DDL","fromSide": "left",  "toSide": "right" },
+
+    { "from": "dispatch",   "to": "priv_guard","label": "cache hit →", "fromSide": "bottom","toSide": "top",   "variant": "dashed" },
+    { "from": "dispatch",   "to": "ft_gen",    "label": "cache miss →","fromSide": "left",  "toSide": "top" },
+
+    { "from": "ft_gen",     "to": "hf",        "label": "generate",   "variant": "dashed" },
+    { "from": "ft_gen",     "to": "syn_val",    "label": "→ validate" },
+    { "from": "sup_gen",    "to": "syn_val",    "label": "→ validate", "fromSide": "bottom","toSide": "right" },
+
+    { "from": "syn_val",    "to": "executor",   "label": "valid →",    "fromSide": "right", "toSide": "left" },
+    { "from": "syn_val",    "to": "sup_gen",    "label": "invalid →",  "fromSide": "top",   "toSide": "left",  "variant": "dashed" },
+
+    { "from": "executor",   "to": "docker",     "label": "exec SQL",   "fromSide": "right", "toSide": "left" },
+    { "from": "executor",   "to": "judge",      "label": "result →",   "fromSide": "right", "toSide": "left" },
+    { "from": "executor",   "to": "sup_gen",    "label": "exec err",   "fromSide": "top",   "toSide": "bottom","variant": "dashed" },
+
+    { "from": "judge",      "to": "groq",       "label": "score",      "variant": "dashed" },
+    { "from": "judge",      "to": "perf_opt",   "label": "correct →",  "fromSide": "bottom","toSide": "right" },
+    { "from": "judge",      "to": "sup_gen",    "label": "wrong →",    "fromSide": "left",  "toSide": "right", "variant": "dashed" },
+
+    { "from": "sup_gen",    "to": "omniroute",  "label": "retry+ctx",  "fromSide": "right", "toSide": "top",   "variant": "dashed" },
+
+    { "from": "perf_opt",   "to": "priv_guard", "label": "→",          "fromSide": "left",  "toSide": "right" },
+
+    { "from": "priv_guard", "to": "session_db", "label": "save",       "variant": "dashed" },
+    { "from": "priv_guard", "to": "langfuse",   "label": "trace span", "fromSide": "right", "toSide": "bottom","variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan",    "title": "Parallel Fan-out", "items": [
+        "cache_lookup + schema_analyzer run concurrently",
+        "LangGraph add_edge fan-in waits for both",
+        "Cache hit skips all LLM inference"
+      ]
+    },
+    { "dot": "violet",  "title": "9 Specialist Agents", "items": [
+        "cache_lookup · schema_analyzer",
+        "finetuned_generator · syntax_validator · executor",
+        "judge · superior_generator · perf_optimizer · privacy_guard"
+      ]
+    },
+    { "dot": "emerald", "title": "Safety", "items": [
+        "SELECT-only enforcement via sqlglot AST walk",
+        "Docker sandboxed execution · read-only DB copy",
+        "PII column redaction + privacy_audit.log"
+      ]
+    }
+  ]
+}

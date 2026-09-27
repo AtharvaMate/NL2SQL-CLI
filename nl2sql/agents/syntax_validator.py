@@ -59,10 +59,30 @@ async def run(state: GraphState) -> dict:
     except sqlglot.errors.ParseError as e:
         return _syntax_fail(state, sql, f"Syntax error: {e}")
 
-    # ── 2. Reject non-SELECT statements (prevent data mutation) ───────────────
+    # ── 2. Reject non-SELECT statements and hidden mutations (prevent data mutation) ──
+    # A top-level check on isinstance(expr, Select) is insufficient: a writable CTE
+    # such as `WITH hack AS (DELETE FROM t) SELECT 1` parses as a top-level Select
+    # while embedding a mutation node in the AST. We walk the full tree.
+    _MUTATION_TYPES = (
+        sqlglot_exp.Delete,
+        sqlglot_exp.Insert,
+        sqlglot_exp.Update,
+        sqlglot_exp.Drop,
+        sqlglot_exp.Create,
+        sqlglot_exp.AlterTable,
+    )
     for expr in expressions:
-        if expr is not None and not isinstance(expr, sqlglot_exp.Select):
+        if expr is None:
+            continue
+        if not isinstance(expr, sqlglot_exp.Select):
             return _syntax_fail(state, sql, "Only SELECT queries are permitted.")
+        # Walk the full AST to catch mutation nodes hidden inside CTEs / subqueries
+        for node in expr.walk():
+            if isinstance(node, _MUTATION_TYPES):
+                return _syntax_fail(
+                    state, sql,
+                    f"Mutation statement '{type(node).__name__}' is not permitted.",
+                )
 
     # ── 3. Schema check — referenced tables must exist ────────────────────────
     schema_tables = _table_names_from_schema(state.get("filtered_schema", ""))

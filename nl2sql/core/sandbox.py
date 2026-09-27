@@ -1,10 +1,22 @@
 from __future__ import annotations
 
 import asyncio
+import re
 import shutil
 import sqlite3
 import tempfile
 from pathlib import Path
+
+# Strip block comments and line comments before extracting the first SQL keyword.
+_COMMENT_RE = re.compile(r"/\*.*?\*/|--[^\n]*", re.DOTALL)
+_ALLOWED_FIRST_KEYWORDS = {"SELECT", "WITH"}
+
+
+def _first_sql_keyword(sql: str) -> str:
+    """Return the first SQL keyword after stripping comments and whitespace."""
+    cleaned = _COMMENT_RE.sub("", sql).strip()
+    parts = cleaned.split()
+    return parts[0].upper() if parts else ""
 
 
 class DockerSandbox:
@@ -57,11 +69,15 @@ class DockerSandbox:
         import base64
         sql_b64 = base64.b64encode(sql.encode()).decode()
         py_script = (
-            "import sqlite3, json, base64\n"
+            "import sqlite3, json, base64, re\n"
+            "_COMMENT_RE = re.compile(r'/\\*.*?\\*/|--[^\\n]*', re.DOTALL)\n"
+            "_ALLOWED = {'SELECT', 'WITH'}\n"
+            "def _first_kw(s):\n"
+            "    c = _COMMENT_RE.sub('', s).strip().split()\n"
+            "    return c[0].upper() if c else ''\n"
             "try:\n"
-            f"    sql = base64.b64decode('{sql_b64}').decode()\n"
-            "    normalized_sql = sql.strip().upper()\n"
-            "    if not normalized_sql.startswith('SELECT'):\n"
+            f"    sql = base64.b64decode('{sql_b64}').decode()\\n\"\n"
+            "    if _first_kw(sql) not in _ALLOWED:\n"
             "        print(json.dumps({'columns': [], 'rows': [], 'row_count': 0, 'error': 'Only SELECT queries are allowed'}))\n"
             "    else:\n"
             f"        conn = sqlite3.connect('/data/{self.db_path.name}')\n"
@@ -113,8 +129,7 @@ class DockerSandbox:
 
     async def _execute_local(self, sql: str) -> dict:
         try:
-            normalized_sql = sql.strip().upper()
-            if not normalized_sql.startswith("SELECT"):
+            if _first_sql_keyword(sql) not in _ALLOWED_FIRST_KEYWORDS:
                 return {
                     "columns": [],
                     "rows": [],

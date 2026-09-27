@@ -32,7 +32,7 @@ def _find_project_root() -> Path:
 
 @dataclass
 class Config:
-    hf_endpoint: str = "https://atharvamate-qwen2-5-1-5b-nl2sql.hf.space"
+    hf_endpoint: str = ""  # Required — set HF_ENDPOINT in .env (no default: avoids routing user queries to a personal endpoint)
     hf_token: str = field(default="")
     omniroute_url: str = "http://localhost:20128/v1/chat/completions"
     omniroute_gen_model: str = "auto/coding:free"

@@ -42,15 +42,23 @@ $ nl2sql query "How many active employees earn above their department average?"
 
 ## Architecture
 
-<img src="docs/architecture.svg" alt="NL2SQL CLI — Agentic Multi-Agent Pipeline" width="100%"/>
+### System Components
 
-> Interactive version with pan/zoom, dark mode, search, and 3 guided views: [`docs/architecture.html`](docs/architecture.html)
+<img src="docs/architecture.svg" alt="NL2SQL CLI — System Architecture" width="100%"/>
+
+> Interactive version with pan/zoom, dark mode, search, and guided views: [`docs/architecture.html`](docs/architecture.html)
+
+### Full 9-Agent Pipeline
+
+<img src="docs/pipeline.svg" alt="NL2SQL CLI — 9-Agent LangGraph Pipeline" width="100%"/>
+
+> Interactive version with 3 guided views (parallel fan-out, generation loop, output path): [`docs/pipeline.html`](docs/pipeline.html)
 
 ---
 
 ## Pipeline: How It Works
 
-### 1 — Parallel Fan-out (new in v2)
+### 1 — Parallel Fan-out
 
 Every query enters a **LangGraph `parallel_start` node** that immediately fans out to two branches running **concurrently**:
 
@@ -77,7 +85,7 @@ parallel_start
 
 ### 3 — Syntax Validation
 
-`syntax_validator` runs **sqlglot** to parse the generated SQL and enforces a `SELECT`-only rule. No `INSERT`, `UPDATE`, `DELETE`, or `DROP` can reach the executor. Schema column names are cross-checked against the filtered DDL.
+`syntax_validator` runs **sqlglot** to parse the generated SQL and enforces a `SELECT`-only rule. No `INSERT`, `UPDATE`, `DELETE`, or `DROP` can reach the executor. Schema column names are cross-checked against the filtered DDL. The AST is walked recursively to block mutations hidden inside CTEs.
 
 - **Pass** → executor
 - **Fail (finetuned model)** → superior_generator
@@ -85,7 +93,7 @@ parallel_start
 
 ### 4 — Sandboxed Execution
 
-`executor` runs the SQL inside a **Docker container** (`python:3.12-slim`) against a read-only copy of the database. A malformed or destructive query cannot touch the real file. Falls back to local SQLite if Docker is unavailable.
+`executor` runs the SQL inside a **Docker container** (`python:3.12-slim`) against a read-only copy of the database. A malformed or destructive query cannot touch the real file. Falls back to local SQLite (read-only URI mode) if Docker is unavailable.
 
 ### 5 — LLM-as-Judge
 
@@ -144,7 +152,7 @@ Question + Schema
   finetuned_generator (Qwen2.5-1.5B · Step 1)
         │
         ▼
-  syntax_validator (sqlglot · SELECT-only)
+  syntax_validator (sqlglot · SELECT-only · AST walk)
         ├─ invalid (finetuned) ──► superior_generator ──┐
         ├─ invalid (superior)  ──► performance_optimizer │
         └─ valid ──────────────────────────────────────  │
@@ -290,9 +298,12 @@ db/
                               # reserved-word columns, LIKE wildcards
 
 docs/
-├── architecture.json         # Archify source spec
-├── architecture.html         # Interactive diagram (pan/zoom/dark mode)
-└── architecture.svg          # Static embed (this README)
+├── architecture.json         # Archify source — system components diagram
+├── architecture.html         # Interactive system diagram (pan/zoom/dark mode)
+├── architecture.svg          # Static embed — system components
+├── nl2sql-pipeline.architecture.json  # Archify source — full 9-agent pipeline
+├── pipeline.html             # Interactive pipeline diagram (3 guided views)
+└── pipeline.svg              # Static embed — full pipeline
 
 eval/
 ├── run_eval.py               # Full Spider benchmark (asyncio.gather, --concurrency)
@@ -347,9 +358,3 @@ Every external dependency degrades cleanly — the core agentic loop has no hard
 | Redis | Results cached with 1hr TTL | Cache skipped; every query hits LLMs |
 | Groq API | `schema_analyzer` + `judge` + `performance_optimizer` use Groq | Falls back to OmniRoute for all LLM calls |
 | Langfuse | Full LLM span tracing | No-op; no impact on results |
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE).

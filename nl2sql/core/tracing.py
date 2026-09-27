@@ -27,6 +27,10 @@ def enable() -> bool:
 
         original_generate = LLMClient.generate
 
+        # Guard against double-patching if enable() is called more than once
+        if getattr(original_generate, "_langfuse_patched", False):
+            return True
+
         async def _traced(self, messages, temperature=0.0, max_tokens=512):
             model_name = self.model or "hf-finetuned"
             t0 = time.monotonic()
@@ -50,6 +54,7 @@ def enable() -> bool:
                     raise
 
         LLMClient.generate = _traced
+        _traced._langfuse_patched = True  # type: ignore[attr-defined]
         lf.flush()
         return True
 

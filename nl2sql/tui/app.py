@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import csv
 import json
 import uuid
@@ -201,7 +200,16 @@ class NL2SQLApp(App):
         if not self.schema_text:
             self._log_error("No schema loaded — check schema path.")
             return
-        asyncio.create_task(self._run_query(question))
+        self._run_query_worker(question)
+
+    # ── query worker (routes exceptions to on_worker_error via @work) ──────────
+    @work(exclusive=True, exit_on_error=False)
+    async def _run_query_worker(self, question: str) -> None:
+        await self._run_query(question)
+
+    def on_worker_error(self, event) -> None:  # type: ignore[override]
+        self._log_error(f"Query failed: {event.error}")
+        self._status("Error — see log")
 
     def _apply_config(self) -> None:
         db_path = self.query_one("#db-input", Input).value.strip()
@@ -263,7 +271,11 @@ class NL2SQLApp(App):
         cache = " · cache" if self._redis else ""
         trace = " · tracing" if tracing else ""
         self._status(f"◆ {Path(self.config.db_path).name} · {docker}{cache}{trace}")
-        asyncio.create_task(self._prewarm())
+        self._prewarm_worker()
+
+    @work(exit_on_error=False)
+    async def _prewarm_worker(self) -> None:
+        await self._prewarm()
 
     async def _prewarm(self) -> None:
         self._log_system("Waking HF endpoint…")
@@ -283,6 +295,10 @@ class NL2SQLApp(App):
     async def _run_query_local(self, question: str) -> None:
         """Run the agentic loop locally (no Redis workers)."""
         log = self.log_widget
+        # Local captures avoid race conditions when rapid successive queries
+        # overwrite self.current_result before the cache write below.
+        final_sql: str = ""
+        final_result: dict | None = None
 
         if self.sandbox and not self.sandbox.is_running and self.sandbox.is_docker_available:
             self._log_system("Starting Docker sandbox…")
@@ -342,6 +358,8 @@ class NL2SQLApp(App):
                 self._log_result_table(ev.result)
                 self.current_result = ev.result
                 self.current_sql = ev.sql
+                final_result = ev.result
+                final_sql = ev.sql
                 self._status("✓ Query successful")
 
             elif ev.phase == "optimized":
@@ -369,10 +387,10 @@ class NL2SQLApp(App):
             elif ev.phase == "error":
                 self._log_error(f"Error: {ev.error}")
 
-        # ── cache successful result ───────────────────────────────────────────
-        if self._redis and self.current_result and "error" not in self.current_result:
+        # ── cache successful result (use local captures to avoid race condition) ─
+        if self._redis and final_result and "error" not in final_result:
             cache_key = CACHE_KEY.format(hash=_cache_hash(question, self.schema_text))
-            payload = json.dumps({"sql": self.current_sql, "result": self.current_result})
+            payload = json.dumps({"sql": final_sql, "result": final_result})
             self._redis.setex(cache_key, CACHE_TTL, payload)
 
         self._save_session(question)
